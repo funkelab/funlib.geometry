@@ -1,5 +1,7 @@
 import numbers
 
+from typing import Iterable
+
 
 class Coordinate(tuple):
     """A ``tuple`` of integers.
@@ -14,6 +16,8 @@ class Coordinate(tuple):
     """
 
     def __new__(cls, *array_like):
+        if len(array_like) == 1 and isinstance(array_like[0], Iterable):
+            array_like = array_like[0]
         return super(Coordinate, cls).__new__(
             cls, [int(x) if x is not None else None for x in array_like]
         )
