@@ -36,33 +36,49 @@ class Coordinate(tuple):
 
     def __add__(self, other):
 
-        assert isinstance(
-            other, tuple
-        ), f"can only add Coordinate or tuples to Coordinate. {type(other)} is invalid"
-        assert self.dims() == len(other), "can only add Coordinate of equal dimensions"
+        if isinstance(other, Coordinate):
+            assert (
+                self.dims() == other.dims()
+            ), "can only add Coordinate of equal dimensions"
+            return Coordinate(
+                a + b if a is not None and b is not None else None
+                for a, b in zip(self, other)
+            )
 
-        return Coordinate(
-            a + b if a is not None and b is not None else None
-            for a, b in zip(self, other)
-        )
+        elif isinstance(other, numbers.Number):
+
+            return Coordinate(a + other if a is not None else None for a in self)
+
+        else:
+
+            raise TypeError(
+                "addition of Coordinate with type %s not supported" % type(other)
+            )
 
     def __sub__(self, other):
 
-        assert isinstance(
-            other, tuple
-        ), f"can only subtract Coordinate or tuples to Coordinate. {type(other)} is invalid"
-        assert self.dims() == len(
-            other
-        ), "can only subtract Coordinate of equal dimensions"
+        if isinstance(other, Coordinate):
+            assert (
+                self.dims() == other.dims()
+            ), "can only subtract Coordinate of equal dimensions"
+            return Coordinate(
+                a - b if a is not None and b is not None else None
+                for a, b in zip(self, other)
+            )
 
-        return Coordinate(
-            a - b if a is not None and b is not None else None
-            for a, b in zip(self, other)
-        )
+        elif isinstance(other, numbers.Number):
+
+            return Coordinate(a - other if a is not None else None for a in self)
+
+        else:
+
+            raise TypeError(
+                "subtraction of Coordinate with type %s not supported" % type(other)
+            )
 
     def __mul__(self, other):
 
-        if isinstance(other, tuple):
+        if isinstance(other, Coordinate):
 
             assert self.dims() == len(
                 other
@@ -85,10 +101,10 @@ class Coordinate(tuple):
 
     def __div__(self, other):
 
-        if isinstance(other, tuple):
+        if isinstance(other, Coordinate):
 
-            assert self.dims() == len(
-                other
+            assert (
+                self.dims() == other.dims()
             ), "can only divide Coordinate of equal dimensions"
 
             return Coordinate(
@@ -108,10 +124,10 @@ class Coordinate(tuple):
 
     def __truediv__(self, other):
 
-        if isinstance(other, tuple):
+        if isinstance(other, Coordinate):
 
-            assert self.dims() == len(
-                other
+            assert (
+                self.dims() == other.dims()
             ), "can only divide Coordinate of equal dimensions"
 
             return Coordinate(
@@ -131,10 +147,10 @@ class Coordinate(tuple):
 
     def __floordiv__(self, other):
 
-        if isinstance(other, tuple):
+        if isinstance(other, Coordinate):
 
-            assert self.dims() == len(
-                other
+            assert (
+                self.dims() == other.dims()
             ), "can only divide Coordinate of equal dimensions"
 
             return Coordinate(
@@ -154,10 +170,10 @@ class Coordinate(tuple):
 
     def __mod__(self, other):
 
-        if isinstance(other, tuple):
+        if isinstance(other, Coordinate):
 
-            assert self.dims() == len(
-                other
+            assert (
+                self.dims() == other.dims()
             ), "can only mod Coordinate of equal dimensions"
 
             return Coordinate(
