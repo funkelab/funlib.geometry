@@ -13,7 +13,7 @@ class Coordinate(tuple):
         size = shape*voxel_size # == Coordinate((20, 15, 4))
     """
 
-    def __new__(cls, array_like):
+    def __new__(cls, *array_like):
         return super(Coordinate, cls).__new__(
             cls, [int(x) if x is not None else None for x in array_like]
         )
