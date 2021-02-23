@@ -7,12 +7,24 @@ class Coordinate(tuple):
     """A ``tuple`` of integers.
 
     Allows the following element-wise operators: addition, subtraction,
-    multiplication, division, absolute value, and negation. This allows to
+    multiplication, division, absolute value, and negation. All operations are
+    applied element wise and support both Coordinates and Numbers. This allows to
     perform simple arithmetics with coordinates, e.g.::
 
-        shape = Coordinate((2, 3, 4))
-        voxel_size = Coordinate((10, 5, 1))
-        size = shape*voxel_size # == Coordinate((20, 15, 4))
+        shape = Coordinate(2, 3, 4)
+        voxel_size = Coordinate(10, 5, 1)
+        size = shape*voxel_size # == Coordinate(20, 15, 4)
+        size * 2 + 1 # == Coordinate(41, 31, 9)
+
+    Coordinates can be initialized with any iterable of ints, e.g.::
+
+        Coordinate((1,2,3))
+        Coordinate([1,2,3])
+        Coordinate(np.array([1,2,3]))
+        
+    Coordinates can also pack multiple args into an iterable, e.g.::
+
+        Coordinate(1,2,3)
     """
 
     def __new__(cls, *array_like):
