@@ -50,7 +50,7 @@ def test_shape():
     assert r.size() is None
 
 
-def test_operators(self):
+def test_operators():
 
     a = Roi((0, 0, 0), (100, 100, 100))
     b = Roi((50, 50, 50), (100, 100, 100))
@@ -90,16 +90,16 @@ def test_operators(self):
     assert a.contains(c)
     assert not b.contains(c)
     assert a.contains(Roi((0, 0, 0), (0, 0, 0)))
-    assert not b.contains(Roi((0, 0, 0), (0, 0, 0)))
+    assert b.contains(Roi((0, 0, 0), (0, 0, 0)))
     assert not a.contains(Roi((None,)*3, (None,)*3))
 
-    assert a.grow((1, 1, 1), (1, 1, 1)) == \
+    assert a.grow(Coord(1, 1, 1), Coord(1, 1, 1)) == \
         Roi((-1, None, -1), (102, None, 102))
-    assert a.grow((-1, -1, -1), (-1, -1, -1)) == \
+    assert a.grow(-1, -1) == \
         Roi((1, None, 1), (98, None, 98))
-    assert a.grow((-1, -1, -1), None) == \
+    assert a.grow(-1, 0) == \
         Roi((1, None, 1), (99, None, 99))
-    assert a.grow(None, (-1, -1, -1)) == \
+    assert a.grow(amount_pos=Coord(-1, -1, -1)) == \
         Roi((0, None, 0), (99, None, 99))
 
 
