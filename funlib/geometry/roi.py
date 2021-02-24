@@ -100,8 +100,8 @@ class Roi(Freezable):
                 self.__shape.dims()))
 
         self.__offset = Coordinate((
-            None
-            if s is None or s == 0 else o
+            o
+            if s is not None else None
             for o, s in zip(self.__offset, self.__shape)))
 
     def get_offset(self):
@@ -174,19 +174,19 @@ class Roi(Freezable):
 
     def contains(self, other):
         '''Test if this ROI contains ``other``, which can be another
-        :class:`Roi` or a :class:`Coordinate`.'''
+        :class:`Roi`, :class:`Coordinate`, or ``tuple``.'''
 
         if isinstance(other, Roi):
 
             if other.empty():
-                return True
+                return self.contains(other.get_begin())
 
             return (
                 self.contains(other.get_begin())
                 and
                 self.contains(other.get_end() - 1))
 
-        elif isinstance(other, Coordinate):
+        elif isinstance(other, tuple):
             return all([
                 (b is None or (p is not None and p >= b))
                 and
@@ -271,7 +271,7 @@ class Roi(Freezable):
 
         Args:
 
-            voxel_size (:class:`Coordinate`):
+            voxel_size (:class:`Coordinate` or ``tuple``):
 
                 The voxel size of the grid to snap to.
 
@@ -281,6 +281,8 @@ class Roi(Freezable):
                 Available modes are 'grow', 'shrink', and 'closest'. Defaults
                 to 'grow'.
         '''
+        if not isinstance(voxel_size, Coordinate):
+            voxel_size = Coordinate(voxel_size)
 
         assert voxel_size.dims() == self.dims(), \
             "dimension of voxel size does not match ROI"
@@ -320,6 +322,10 @@ class Roi(Freezable):
                 Passing in a single integer grows that amount in all
                 dimensions. Defaults to zero.
         '''
+        if isinstance(amount_neg, tuple):
+            amount_neg = Coordinate(amount_neg)
+        if isinstance(amount_pos, tuple):
+            amount_pos = Coordinate(amount_pos)
 
         offset = self.__offset - amount_neg
         shape = self.__shape + amount_neg + amount_pos
