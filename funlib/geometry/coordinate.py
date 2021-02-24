@@ -42,6 +42,18 @@ class Coordinate(tuple):
 
         return all([a % b == 0 for a, b in zip(self, coordinate)])
 
+    def round_division(self, other):
+        """
+        Will always round down if self % other == other / 2.
+        """
+        return (self + (other - 1) / 2) / other
+
+    def floor_division(self, other):
+        return self / other
+
+    def ceil_division(self, other):
+        return (self + other - 1) / other
+
     def __neg__(self):
 
         return Coordinate(-a if a is not None else None for a in self)

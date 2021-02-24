@@ -67,6 +67,15 @@ def test_arithmetic():
         a // c
 
 
+def test_division():
+    a = Coordinate(10, 15, 25)
+    b = Coordinate(5, 6, 7)
+
+    assert a.floor_division(b) == (2, 2, 3)
+    assert a.round_division(b) == (2, 2, 4)
+    assert a.ceil_division(b) == (2, 3, 4)
+
+
 def test_none():
 
     a = Coordinate((None, 1, 2))
