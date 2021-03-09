@@ -104,10 +104,12 @@ class Roi(Freezable):
         '''Ensure that offset and shape have same number of dimensions and
         offsets for unbounded or empty dimensions are None.'''
 
-        assert self.__offset.dims() == self.__shape.dims(), (
-            "offset dimension %d != shape dimension %d" % (
-                self.__offset.dims(),
-                self.__shape.dims()))
+        assert (
+            self.__offset.dims == self.__shape.dims
+        ), "offset dimension %d != shape dimension %d" % (
+            self.__offset.dims,
+            self.__shape.dims,
+        )
 
         self.__offset = Coordinate((
             o
