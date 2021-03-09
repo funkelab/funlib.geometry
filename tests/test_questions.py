@@ -44,7 +44,7 @@ def test_empty_rois():
     Empty roi's can (?) have a offset
     """
 
-    assert R((1, 2, 3), (0, 0, 0)).get_begin() == (1, 2, 3)
+    assert R((1, 2, 3), (0, 0, 0)).begin == (1, 2, 3)
     assert R((0, 0, 0), (10, 10, 10)).contains(R((5, 5, 5), (0, 0, 0)))
     assert not R((0, 0, 0), (10, 10, 10)).contains(R((-1, 5, 5), (0, 0, 0)))
 

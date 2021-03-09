@@ -63,21 +63,31 @@ class Roi(Freezable):
 
         self.__consolidate_offset()
 
-    def set_offset(self, offset):
-        ''' Set the offset of this Roi.
+    @property
+    def offset(self):
+        return self.__offset
+
+    @offset.setter
+    def offset(self, offset):
+        """Set the offset of this Roi.
 
         Args:
             offset (array-like):
 
                 The new offset.  Entries can be ``None``` to indicate
                 unboundedness or empty ROI.
-        '''
+        """
 
         self.__offset = Coordinate(offset)
         self.__consolidate_offset()
 
-    def set_shape(self, shape):
-        '''Set the shape of this ROI.
+    @property
+    def shape(self):
+        return self.__shape
+
+    @shape.setter
+    def shape(self, shape):
+        """Set the shape of this ROI.
 
         Args:
 
@@ -85,7 +95,7 @@ class Roi(Freezable):
 
                 The new shape. Entries can be ``None`` to indicate
                 unboundedness.
-        '''
+        """
 
         self.__shape = Coordinate(shape)
         self.__consolidate_offset()
@@ -104,31 +114,27 @@ class Roi(Freezable):
             if s is not None else None
             for o, s in zip(self.__offset, self.__shape)))
 
-    def get_offset(self):
+    @property
+    def begin(self):
+        """Smallest coordinate inside ROI."""
         return self.__offset
 
-    def get_begin(self):
-        '''Smallest coordinate inside ROI.'''
-        return self.__offset
-
-    def get_end(self):
-        '''Smallest coordinate which is component-wise larger than any
-           inside ROI.'''
+    @property
+    def end(self):
+        """Smallest coordinate which is component-wise larger than any
+        inside ROI."""
         return self.__offset + self.__shape
 
-    def get_shape(self):
-        '''Get the shape of this ROI.'''
-        return self.__shape
-
-    def get_center(self):
-        '''Get the center of this ROI.'''
-        return self.__offset + self.__shape/2
+    @property
+    def center(self):
+        """Get the center of this ROI."""
+        return self.__offset + self.__shape / 2
 
     def to_slices(self):
         '''Get a ``tuple`` of ``slice`` that represent this ROI and can be used
         to index arrays.'''
         slices = []
-        for d in range(self.dims()):
+        for d in range(self.dims):
             if self.__shape[d] is None:
                 s = slice(None, None)
             elif self.__shape[d] == 0:
@@ -145,16 +151,18 @@ class Roi(Freezable):
 
         return self.to_slices()
 
+    @property
     def dims(self):
         '''The the number of dimensions of this ROI.'''
 
-        return self.__shape.dims()
+        return self.__shape.dims
 
+    @property
     def size(self):
         '''Get the volume of this ROI. Returns ``None`` if the ROI is
         unbounded.'''
 
-        if self.unbounded():
+        if self.unbounded:
             return None
 
         size = 1
@@ -162,11 +170,13 @@ class Roi(Freezable):
             size *= d
         return size
 
+    @property
     def empty(self):
         '''Test if this ROI is empty.'''
 
-        return self.size() == 0
+        return self.size == 0
 
+    @property
     def unbounded(self):
         '''Test if this ROI is unbounded.'''
 
@@ -178,49 +188,48 @@ class Roi(Freezable):
 
         if isinstance(other, Roi):
 
-            if other.empty():
-                return self.contains(other.get_begin())
+            if other.empty:
+                return self.contains(other.begin)
 
-            return (
-                self.contains(other.get_begin())
-                and
-                self.contains(other.get_end() - 1))
+            return self.contains(other.begin) and self.contains(
+                other.end - 1
+            )
 
         elif isinstance(other, tuple):
-            return all([
-                (b is None or (p is not None and p >= b))
-                and
-                (e is None or (p is not None and p < e))
-                for p, b, e in zip(other, self.get_begin(), self.get_end())
-            ])
+            return all(
+                [
+                    (b is None or (p is not None and p >= b))
+                    and (e is None or (p is not None and p < e))
+                    for p, b, e in zip(other, self.begin, self.end)
+                ]
+            )
 
     def intersects(self, other):
         '''Test if this ROI intersects with another :class:`Roi`.'''
 
-        assert self.dims() == other.dims()
+        assert self.dims == other.dims
 
-        if self.empty() or other.empty():
+        if self.empty or other.empty:
             return False
 
         # separated if at least one dimension is separated
-        separated = any([
-            # a dimension is separated if:
-            # none of the shapes is unbounded
-            (None not in [b1, b2, e1, e2])
-            and
-            (
-                # either b1 starts after e2
-                (b1 >= e2)
-                or
-                # or b2 starts after e1
-                (b2 >= e1)
-            )
-            for b1, b2, e1, e2 in zip(
-                self.get_begin(),
-                other.get_begin(),
-                self.get_end(),
-                other.get_end())
-        ])
+        separated = any(
+            [
+                # a dimension is separated if:
+                # none of the shapes is unbounded
+                (None not in [b1, b2, e1, e2])
+                and (
+                    # either b1 starts after e2
+                    (b1 >= e2)
+                    or
+                    # or b2 starts after e1
+                    (b2 >= e1)
+                )
+                for b1, b2, e1, e2 in zip(
+                    self.begin, other.begin, self.end, other.end
+                )
+            ]
+        )
 
         return not separated
 
@@ -228,36 +237,44 @@ class Roi(Freezable):
         '''Get the intersection of this ROI with another :class:`Roi`.'''
 
         if not self.intersects(other):
-            return Roi((None,)*self.dims(), (0,)*self.dims())  # empty ROI
+            return Roi((None,) * self.dims, (0,) * self.dims)  # empty ROI
 
-        begin = Coordinate((
-            self.__left_max(b1, b2)
-            for b1, b2 in zip(self.get_begin(), other.get_begin())
-        ))
-        end = Coordinate((
-            self.__right_min(e1, e2)
-            for e1, e2 in zip(self.get_end(), other.get_end())
-        ))
+        begin = Coordinate(
+            (
+                self.__left_max(b1, b2)
+                for b1, b2 in zip(self.begin, other.begin)
+            )
+        )
+        end = Coordinate(
+            (
+                self.__right_min(e1, e2)
+                for e1, e2 in zip(self.end, other.end)
+            )
+        )
 
         return Roi(begin, end - begin)
 
     def union(self, other):
         '''Get the union of this ROI with another :class:`Roi`.'''
 
-        if self.empty():
+        if self.empty:
             return other
 
-        if other.empty():
+        if other.empty:
             return self
 
-        begin = Coordinate((
-            self.__left_min(b1, b2)
-            for b1, b2 in zip(self.get_begin(), other.get_begin())
-        ))
-        end = Coordinate((
-            self.__right_max(e1, e2)
-            for e1, e2 in zip(self.get_end(), other.get_end())
-        ))
+        begin = Coordinate(
+            (
+                self.__left_min(b1, b2)
+                for b1, b2 in zip(self.begin, other.begin)
+            )
+        )
+        end = Coordinate(
+            (
+                self.__right_max(e1, e2)
+                for e1, e2 in zip(self.end, other.end)
+            )
+        )
 
         return Roi(begin, end - begin)
 
@@ -266,8 +283,8 @@ class Roi(Freezable):
 
         return Roi(self.__offset + by, self.__shape)
 
-    def snap_to_grid(self, voxel_size, mode='grow'):
-        '''Align a ROI with a given voxel size.
+    def snap_to_grid(self, voxel_size, mode="grow"):
+        """Align a ROI with a given voxel size.
 
         Args:
 
@@ -280,30 +297,31 @@ class Roi(Freezable):
                 How to align the ROI if it is not a multiple of the voxel size.
                 Available modes are 'grow', 'shrink', and 'closest'. Defaults
                 to 'grow'.
-        '''
+        """
         if not isinstance(voxel_size, Coordinate):
             voxel_size = Coordinate(voxel_size)
 
-        assert voxel_size.dims() == self.dims(), \
-            "dimension of voxel size does not match ROI"
+        assert (
+            voxel_size.dims == self.dims
+        ), "dimension of voxel size does not match ROI"
 
         assert 0 not in voxel_size, "Voxel size cannot contain zero"
 
-        if mode == 'closest':
-            begin_in_voxel = self.get_begin().round_division(voxel_size)
-            end_in_voxel = self.get_end().round_division(voxel_size)
-        elif mode == 'grow':
-            begin_in_voxel = self.get_begin().floor_division(voxel_size)
-            end_in_voxel = self.get_end().ceil_division(voxel_size)
-        elif mode == 'shrink':
-            begin_in_voxel = self.get_begin().ceil_division(voxel_size)
-            end_in_voxel = self.get_end().floor_division(voxel_size)
+        if mode == "closest":
+            begin_in_voxel = self.begin.round_division(voxel_size)
+            end_in_voxel = self.end.round_division(voxel_size)
+        elif mode == "grow":
+            begin_in_voxel = self.begin.floor_division(voxel_size)
+            end_in_voxel = self.end.ceil_division(voxel_size)
+        elif mode == "shrink":
+            begin_in_voxel = self.begin.ceil_division(voxel_size)
+            end_in_voxel = self.end.floor_division(voxel_size)
         else:
             raise RuntimeError('Unknown mode %s for snap_to_grid' % mode)
 
         return Roi(
-            begin_in_voxel*voxel_size,
-            (end_in_voxel - begin_in_voxel)*voxel_size)
+            begin_in_voxel * voxel_size, (end_in_voxel - begin_in_voxel) * voxel_size
+        )
 
     def grow(self, amount_neg=0, amount_pos=0):
         '''Grow a ROI by the given amounts in each direction:
@@ -434,17 +452,15 @@ class Roi(Freezable):
         return NotImplemented
 
     def __repr__(self):
-        if self.empty():
+        if self.empty:
             return "[empty ROI]"
         slices = ", ".join(
             [
-                (str(b) if b is not None else "") +
-                ":" +
-                (str(e) if e is not None else "")
-                for b, e in zip(self.get_begin(), self.get_end())
-            ])
-        dims = ", ".join(
-            str(a) if a is not None else "inf"
-            for a in self.__shape
+                (str(b) if b is not None else "")
+                + ":"
+                + (str(e) if e is not None else "")
+                for b, e in zip(self.begin, self.end)
+            ]
         )
+        dims = ", ".join(str(a) if a is not None else "inf" for a in self.__shape)
         return "[" + slices + "] (" + dims + ")"

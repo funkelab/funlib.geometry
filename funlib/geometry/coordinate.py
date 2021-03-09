@@ -21,7 +21,7 @@ class Coordinate(tuple):
         Coordinate((1,2,3))
         Coordinate([1,2,3])
         Coordinate(np.array([1,2,3]))
-        
+
     Coordinates can also pack multiple args into an iterable, e.g.::
 
         Coordinate(1,2,3)
@@ -34,6 +34,7 @@ class Coordinate(tuple):
             cls, [int(x) if x is not None else None for x in array_like]
         )
 
+    @property
     def dims(self):
         return len(self)
 
@@ -66,7 +67,7 @@ class Coordinate(tuple):
 
         if isinstance(other, Coordinate):
             assert (
-                self.dims() == other.dims()
+                self.dims == other.dims
             ), "can only add Coordinate of equal dimensions"
             return Coordinate(
                 a + b if a is not None and b is not None else None
@@ -87,7 +88,7 @@ class Coordinate(tuple):
 
         if isinstance(other, Coordinate):
             assert (
-                self.dims() == other.dims()
+                self.dims == other.dims
             ), "can only subtract Coordinate of equal dimensions"
             return Coordinate(
                 a - b if a is not None and b is not None else None
@@ -108,8 +109,8 @@ class Coordinate(tuple):
 
         if isinstance(other, Coordinate):
 
-            assert self.dims() == len(
-                other
+            assert (
+                self.dims == other.dims
             ), "can only multiply Coordinate of equal dimensions"
 
             return Coordinate(
@@ -132,7 +133,7 @@ class Coordinate(tuple):
         if isinstance(other, Coordinate):
 
             assert (
-                self.dims() == other.dims()
+                self.dims == other.dims
             ), "can only divide Coordinate of equal dimensions"
 
             return Coordinate(
@@ -155,7 +156,7 @@ class Coordinate(tuple):
         if isinstance(other, Coordinate):
 
             assert (
-                self.dims() == other.dims()
+                self.dims == other.dims
             ), "can only divide Coordinate of equal dimensions"
 
             return Coordinate(
@@ -178,7 +179,7 @@ class Coordinate(tuple):
         if isinstance(other, Coordinate):
 
             assert (
-                self.dims() == other.dims()
+                self.dims == other.dims
             ), "can only divide Coordinate of equal dimensions"
 
             return Coordinate(
@@ -201,7 +202,7 @@ class Coordinate(tuple):
         if isinstance(other, Coordinate):
 
             assert (
-                self.dims() == other.dims()
+                self.dims == other.dims
             ), "can only mod Coordinate of equal dimensions"
 
             return Coordinate(
