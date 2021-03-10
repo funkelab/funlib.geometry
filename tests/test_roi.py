@@ -122,6 +122,15 @@ def test_snap():
     with pytest.raises(RuntimeError):
         a.snap_to_grid(Coord(3, 1), 'doesntexist')
 
+    r = Roi((-20,), (2,))
+    c = Coord(
+        2,
+    )
+    assert not r.snap_to_grid(c, mode="shrink").empty, (
+        f"begin: {(r.begin, r.begin.ceil_division(c))}, "
+        f"end: {(r.end, r.end.floor_division(c))}"
+    )
+
 
 def test_arithmetic():
 
