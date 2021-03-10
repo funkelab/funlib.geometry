@@ -1,8 +1,9 @@
 from .coordinate import Coordinate
 from .freezable import Freezable
+
 import copy
 import numbers
-
+from typing import Iterable
 import logging
 
 logger = logging.getLogger(__file__)
@@ -191,20 +192,22 @@ class Roi(Freezable):
         if isinstance(other, Roi):
 
             if other.empty:
+                return True # gunpowder seems to expect this for Pad node
                 return self.contains(other.begin)
 
             return self.contains(other.begin) and self.contains(
                 other.end - 1
             )
 
-        elif isinstance(other, tuple):
-            return all(
-                [
-                    (b is None or (p is not None and p >= b))
-                    and (e is None or (p is not None and p < e))
-                    for p, b, e in zip(other, self.begin, self.end)
-                ]
-            )
+        elif isinstance(other, Iterable):
+            axis_containment = [
+                (b is None or (p is not None and p >= b))
+                and (e is None or (p is not None and p < e))
+                for p, b, e in zip(other, self.begin, self.end)
+            ]
+            return len(axis_containment) == self.dims and all(axis_containment)
+        else:
+            raise Exception(f"cannot compute containment on object of type: {type(other)}")
 
     def intersects(self, other):
         '''Test if this ROI intersects with another :class:`Roi`.'''
