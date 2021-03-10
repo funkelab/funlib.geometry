@@ -47,13 +47,13 @@ class Coordinate(tuple):
         """
         Will always round down if self % other == other / 2.
         """
-        return (self + (other - 1) / 2) / other
+        return (self + (other - 1) // 2) // other
 
     def floor_division(self, other):
-        return self / other
+        return self // other
 
     def ceil_division(self, other):
-        return (self + other - 1) / other
+        return (self + other - 1) // other
 
     def __neg__(self):
 
