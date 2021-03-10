@@ -192,8 +192,8 @@ class Roi(Freezable):
         if isinstance(other, Roi):
 
             if other.empty:
-                return True # gunpowder seems to expect this for Pad node
-                return self.contains(other.begin)
+                # gunpowder expects empty rois to contain empty
+                return self.empty or self.contains(other.begin)
 
             return self.contains(other.begin) and self.contains(
                 other.end - 1
