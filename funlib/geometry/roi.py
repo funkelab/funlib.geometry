@@ -82,6 +82,12 @@ class Roi(Freezable):
         self.__offset = Coordinate(offset)
         self.__consolidate_offset()
 
+    def get_offset(self):
+        return self.offset
+
+    def set_offset(self, new_offset):
+        self.offset = new_offset
+
     @property
     def shape(self):
         return self.__shape
@@ -100,6 +106,12 @@ class Roi(Freezable):
 
         self.__shape = Coordinate(shape)
         self.__consolidate_offset()
+
+    def get_shape(self):
+        return self.shape
+
+    def set_shape(self, new_shape):
+        self.shape = new_shape
 
     def __consolidate_offset(self):
         '''Ensure that offset and shape have same number of dimensions and
@@ -122,16 +134,25 @@ class Roi(Freezable):
         """Smallest coordinate inside ROI."""
         return self.__offset
 
+    def get_begin(self):
+        return self.begin
+
     @property
     def end(self):
         """Smallest coordinate which is component-wise larger than any
         inside ROI."""
         return self.__offset + self.__shape
 
+    def get_end(self):
+        return self.end
+
     @property
     def center(self):
         """Get the center of this ROI."""
         return self.__offset + self.__shape / 2
+
+    def get_center(self):
+        return self.center
 
     def to_slices(self):
         '''Get a ``tuple`` of ``slice`` that represent this ROI and can be used
@@ -172,6 +193,9 @@ class Roi(Freezable):
         for d in self.__shape:
             size *= d
         return size
+
+    def get_size(self):
+        return self.size
 
     @property
     def empty(self):
