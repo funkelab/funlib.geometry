@@ -64,6 +64,9 @@ class Coordinate(tuple):
         return Coordinate(abs(a) if a is not None else None for a in self)
 
     def __add__(self, other):
+        
+        if isinstance(other, tuple):
+            other = Coordinate(other)
 
         if isinstance(other, Coordinate):
             assert (
@@ -85,6 +88,9 @@ class Coordinate(tuple):
             )
 
     def __sub__(self, other):
+        
+        if isinstance(other, tuple):
+            other = Coordinate(other)
 
         if isinstance(other, Coordinate):
             assert (
@@ -106,6 +112,9 @@ class Coordinate(tuple):
             )
 
     def __mul__(self, other):
+        
+        if isinstance(other, tuple):
+            other = Coordinate(other)
 
         if isinstance(other, Coordinate):
 
@@ -129,6 +138,9 @@ class Coordinate(tuple):
             )
 
     def __div__(self, other):
+        
+        if isinstance(other, tuple):
+            other = Coordinate(other)
 
         if isinstance(other, Coordinate):
 
@@ -152,6 +164,9 @@ class Coordinate(tuple):
             )
 
     def __truediv__(self, other):
+        
+        if isinstance(other, tuple):
+            other = Coordinate(other)
 
         if isinstance(other, Coordinate):
 
@@ -175,6 +190,9 @@ class Coordinate(tuple):
             )
 
     def __floordiv__(self, other):
+        
+        if isinstance(other, tuple):
+            other = Coordinate(other)
 
         if isinstance(other, Coordinate):
 
@@ -198,6 +216,9 @@ class Coordinate(tuple):
             )
 
     def __mod__(self, other):
+        
+        if isinstance(other, tuple):
+            other = Coordinate(other)
 
         if isinstance(other, Coordinate):
 
