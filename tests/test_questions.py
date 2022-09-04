@@ -57,11 +57,11 @@ def test_empty_rois():
 
     # what is the offset when you intersect with no overlap? Shrink more than
     # the size? Shrink exactly to zero size?
-    roi1 = R((0, 0, 0,), (10, 10, 10))
-    roi2 = R((10, 10, 10,), (10, 10, 10))
-    roi3 = R((100, 100, 100,), (10, 10, 10))
-    assert roi1.intersect(roi2) == R((None, None, None,), (0, 0, 0))
-    assert roi1.intersect(roi3) == R((10, 10, 10,), (0, 0, 0))
+    roi1 = R((0, 0, 0), (10, 10, 10))
+    roi2 = R((10, 10, 10), (10, 10, 10))
+    roi3 = R((100, 100, 100), (10, 10, 10))
+    assert roi1.intersect(roi2) == R((None, None, None), (0, 0, 0))
+    assert roi1.intersect(roi3) == R((10, 10, 10), (0, 0, 0))
     assert roi1.grow(-6, -6) == R((None, None, None), (0, 0, 0))
     assert roi1.grow(-5, -5) == R((5, 5, 5), (0, 0, 0))
 

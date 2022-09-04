@@ -93,34 +93,31 @@ def test_operators():
     assert b.contains(Roi((0, 0, 0), (0, 0, 0)))
     assert not a.contains(Roi((None,) * 3, (None,) * 3))
 
-    assert a.grow(Coord(1, 1, 1), Coord(1, 1, 1)) == \
-        Roi((-1, None, -1), (102, None, 102))
-    assert a.grow(-1, -1) == \
-        Roi((1, None, 1), (98, None, 98))
-    assert a.grow(-1, 0) == \
-        Roi((1, None, 1), (99, None, 99))
-    assert a.grow(amount_pos=Coord(-1, -1, -1)) == \
-        Roi((0, None, 0), (99, None, 99))
+    assert a.grow(Coord(1, 1, 1), Coord(1, 1, 1)) == Roi(
+        (-1, None, -1), (102, None, 102)
+    )
+    assert a.grow(-1, -1) == Roi((1, None, 1), (98, None, 98))
+    assert a.grow(-1, 0) == Roi((1, None, 1), (99, None, 99))
+    assert a.grow(amount_pos=Coord(-1, -1, -1)) == Roi((0, None, 0), (99, None, 99))
 
 
 def test_snap():
 
     a = Roi((1,), (7,))
 
-    assert a.snap_to_grid(Coord(2,), 'grow') == Roi((0,), (8,))
-    assert a.snap_to_grid(Coord(2,), 'shrink') == Roi((2,), (6,))
-    assert a.snap_to_grid(Coord(2,), 'closest') == Roi((0,), (8,))
+    assert a.snap_to_grid(Coord(2), "grow") == Roi((0,), (8,))
+    assert a.snap_to_grid(Coord(2), "shrink") == Roi((2,), (6,))
+    assert a.snap_to_grid(Coord(2), "closest") == Roi((0,), (8,))
 
-    assert a.snap_to_grid(Coord(3,), 'grow') == Roi((0,), (9,))
-    assert a.snap_to_grid(Coord(3,), 'shrink') == Roi((3,), (3,))
-    assert a.snap_to_grid(Coord(3,), 'closest') == Roi((0,), (9,))
+    assert a.snap_to_grid(Coord(3), "grow") == Roi((0,), (9,))
+    assert a.snap_to_grid(Coord(3), "shrink") == Roi((3,), (3,))
+    assert a.snap_to_grid(Coord(3), "closest") == Roi((0,), (9,))
 
     a = Roi((1, None), (7, None))
-    assert a.snap_to_grid(Coord(2, 1), 'grow') == \
-        Roi((0, None), (8, None))
+    assert a.snap_to_grid(Coord(2, 1), "grow") == Roi((0, None), (8, None))
 
     with pytest.raises(RuntimeError):
-        a.snap_to_grid(Coord(3, 1), 'doesntexist')
+        a.snap_to_grid(Coord(3, 1), "doesntexist")
 
     r = Roi((-20,), (2,))
     c = Coord(
