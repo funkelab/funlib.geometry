@@ -64,6 +64,9 @@ class Roi(Freezable):
 
         self.__consolidate_offset()
 
+    def squeeze(self, dim: int):
+        return Roi(self.offset.squeeze(dim), self.shape.squeeze(dim))
+
     @property
     def offset(self):
         return self.__offset
