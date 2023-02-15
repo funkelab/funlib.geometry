@@ -75,13 +75,13 @@ def test_division():
     assert a.round_division(b) == (2, 2, 4)
     assert a.ceil_division(b) == (2, 3, 4)
 
+
 def test_powers():
     a = Coordinate(2, 3, 0)
     b = Coordinate(2, 0, 1)
 
-    assert a**b == (4, 1, 0)
-    assert a**2 == (4, 9, 0)
-
+    assert a ** b == (4, 1, 0)
+    assert a ** 2 == (4, 9, 0)
 
 
 def test_none():

@@ -38,7 +38,7 @@ class Coordinate(tuple):
     def dims(self):
         return len(self)
 
-    def squeeze(self, dim:int = 0):
+    def squeeze(self, dim: int = 0):
         return Coordinate(c for i, c in enumerate(self) if i != dim)
 
     def is_multiple_of(self, coordinate):
@@ -232,13 +232,13 @@ class Coordinate(tuple):
             ), "can only raise to Coordinate of equal dimensions"
 
             return Coordinate(
-                a**b if a is not None and b is not None else None
+                a ** b if a is not None and b is not None else None
                 for a, b in zip(self, other)
             )
 
         elif isinstance(other, numbers.Number):
 
-            return Coordinate(a**other if a is not None else None for a in self)
+            return Coordinate(a ** other if a is not None else None for a in self)
 
         else:
 

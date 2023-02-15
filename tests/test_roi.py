@@ -2,15 +2,17 @@ from funlib.geometry import Roi
 from funlib.geometry import Coordinate as Coord
 import pytest
 
+
 def test_squeeze():
 
-    r = Roi((1,2,3),(4,5,6))
+    r = Roi((1, 2, 3), (4, 5, 6))
     assert r.dims == 3
     r = r.squeeze(1)
     assert r.dims == 2
 
-    assert r == Roi((1,3),(4,6))
-    
+    assert r == Roi((1, 3), (4, 6))
+
+
 def test_shape():
 
     r = Roi((0,), (1,))
