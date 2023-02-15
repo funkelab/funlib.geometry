@@ -8,7 +8,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="funlib.geometry",
-    version="0.1",
+    version="0.2",
     long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/funkelab/funlib.geometry",
