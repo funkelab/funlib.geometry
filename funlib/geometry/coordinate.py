@@ -38,7 +38,7 @@ class Coordinate(tuple):
     def dims(self):
         return len(self)
 
-    def squeeze(self, dim):
+    def squeeze(self, dim:int = 0):
         return Coordinate(c for i, c in enumerate(self) if i != dim)
 
     def is_multiple_of(self, coordinate):
