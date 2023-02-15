@@ -64,6 +64,9 @@ class Roi(Freezable):
 
         self.__consolidate_offset()
 
+    def squeeze(self, dim: int = 0):
+        return Roi(self.offset.squeeze(dim), self.shape.squeeze(dim))
+
     @property
     def offset(self):
         return self.__offset
@@ -201,7 +204,7 @@ class Roi(Freezable):
     def empty(self):
         """Test if this ROI is empty."""
 
-        return self.size == 0
+        return any([x is not None and x <= 0 for x in self.shape])
 
     @property
     def unbounded(self):
