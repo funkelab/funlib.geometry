@@ -1,0 +1,36 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "funlib.geometry"
+description = "A package for Coordinates, Rois and common operations in Coordinate spaces."
+authors = [
+    { name = "Jan Funke", email = "funkej@hhmi.org" },
+    { name = "William Patton", email = "pattonw@hhmi.org" },
+    { name = "Caroline Malin-Mayor" },
+]
+license = { text = "MIT" }
+readme = "README.md"
+dynamic = ["version"]
+
+classifiers = ["Programming Language :: Python :: 3"]
+keywords = []
+requires-python = ">=3.7"
+
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov", "mypy", "ruff"]
+
+[tool.setuptools.dynamic]
+version = { attr = "funlib.geometry.__version__" }
+
+[tool.black]
+target_version = ['py38', 'py39', 'py310']
+
+[tool.setuptools.packages.find]
+include = ["funlib.geometry*"]
+
+[tool.setuptools.package-data]
+"funlib.geometry" = ["py.typed"]
