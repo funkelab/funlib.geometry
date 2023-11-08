@@ -4,7 +4,6 @@ from funlib.geometry import Coordinate
 
 
 def test_constructor():
-
     # construct from tuples, lists, and generators
 
     assert Coordinate(0) == (0,)
@@ -21,7 +20,6 @@ def test_constructor():
 
 
 def test_arithmetic():
-
     a = Coordinate((1, 2, 3))
     b = Coordinate((4, 5, 6))
     c = Coordinate((7, 8))
@@ -80,12 +78,11 @@ def test_powers():
     a = Coordinate(2, 3, 0)
     b = Coordinate(2, 0, 1)
 
-    assert a ** b == (4, 1, 0)
-    assert a ** 2 == (4, 9, 0)
+    assert a**b == (4, 1, 0)
+    assert a**2 == (4, 9, 0)
 
 
 def test_none():
-
     a = Coordinate((None, 1, 2))
     b = Coordinate((3, 4, None))
 

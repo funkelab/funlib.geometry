@@ -4,7 +4,6 @@ import pytest
 
 
 def test_squeeze():
-
     r = Roi((1, 2, 3), (4, 5, 6))
     assert r.dims == 3
     r = r.squeeze(1)
@@ -14,7 +13,6 @@ def test_squeeze():
 
 
 def test_shape():
-
     r = Roi((0,), (1,))
     assert r.size == 1
     assert r.empty is False
@@ -61,7 +59,6 @@ def test_shape():
 
 
 def test_operators():
-
     a = Roi((0, 0, 0), (100, 100, 100))
     b = Roi((50, 50, 50), (100, 100, 100))
 
@@ -112,7 +109,6 @@ def test_operators():
 
 
 def test_snap():
-
     a = Roi((1,), (7,))
 
     assert a.snap_to_grid(Coord(2), "grow") == Roi((0,), (8,))
@@ -140,7 +136,6 @@ def test_snap():
 
 
 def test_arithmetic():
-
     a = Roi((1, None), (7, None))
 
     assert a + 1 == Roi((2, None), (7, None))
