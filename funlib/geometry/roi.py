@@ -361,10 +361,14 @@ class Roi(Freezable):
                 Passing in a single integer grows that amount in all
                 dimensions. Defaults to zero.
         """
-        if isinstance(amount_neg, tuple):
-            _amount_neg = Coordinate(amount_neg)
-        if isinstance(amount_pos, tuple):
-            _amount_pos = Coordinate(amount_pos)
+        if isinstance(amount_neg, Iterable):
+            _amount_neg: Union[Coordinate, int] = Coordinate(amount_neg)
+        else:
+            _amount_neg = amount_neg
+        if isinstance(amount_pos, Iterable):
+            _amount_pos: Union[Coordinate, int] = Coordinate(amount_pos)
+        else:
+            _amount_pos = amount_pos
 
         offset = self.__offset - _amount_neg
         shape = self.__shape + _amount_neg + _amount_pos

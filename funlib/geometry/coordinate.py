@@ -1,4 +1,5 @@
 from typing import Iterable, Any, Union
+import numbers
 
 
 class Coordinate(tuple):
@@ -62,7 +63,7 @@ class Coordinate(tuple):
     def __abs__(self) -> "Coordinate":
         return Coordinate(abs(a) if a is not None else None for a in self)
 
-    def __add__(self, other: Union[Any, "Coordinate", int]) -> "Coordinate":
+    def __add__(self, other: Union[Any, "Coordinate", numbers.Number]) -> "Coordinate":
         if isinstance(other, Coordinate):
             assert (
                 self.dims == other.dims
@@ -72,7 +73,7 @@ class Coordinate(tuple):
                 for a, b in zip(self, other)
             )
 
-        elif isinstance(other, int):
+        elif isinstance(other, numbers.Number):
             return Coordinate(a + other if a is not None else None for a in self)
 
         else:
@@ -80,7 +81,7 @@ class Coordinate(tuple):
                 "addition of Coordinate with type %s not supported" % type(other)
             )
 
-    def __sub__(self, other: Union["Coordinate", int]) -> "Coordinate":
+    def __sub__(self, other: Union["Coordinate", numbers.Number]) -> "Coordinate":
         if isinstance(other, Coordinate):
             assert (
                 self.dims == other.dims
@@ -90,7 +91,7 @@ class Coordinate(tuple):
                 for a, b in zip(self, other)
             )
 
-        elif isinstance(other, int):
+        elif isinstance(other, numbers.Number):
             return Coordinate(a - other if a is not None else None for a in self)
 
         else:
@@ -98,7 +99,7 @@ class Coordinate(tuple):
                 "subtraction of Coordinate with type %s not supported" % type(other)
             )
 
-    def __mul__(self, other: Union[Any, "Coordinate", int]) -> "Coordinate":
+    def __mul__(self, other: Union[Any, "Coordinate", numbers.Number]) -> "Coordinate":
         if isinstance(other, Coordinate):
             assert (
                 self.dims == other.dims
@@ -109,7 +110,7 @@ class Coordinate(tuple):
                 for a, b in zip(self, other)
             )
 
-        elif isinstance(other, int):
+        elif isinstance(other, numbers.Number):
             return Coordinate(a * other if a is not None else None for a in self)
 
         else:
@@ -117,7 +118,7 @@ class Coordinate(tuple):
                 "multiplication of Coordinate with type %s not supported" % type(other)
             )
 
-    def __div__(self, other: Union["Coordinate", int]) -> "Coordinate":
+    def __div__(self, other: Union["Coordinate", numbers.Number]) -> "Coordinate":
         if isinstance(other, Coordinate):
             assert (
                 self.dims == other.dims
@@ -128,7 +129,7 @@ class Coordinate(tuple):
                 for a, b in zip(self, other)
             )
 
-        elif isinstance(other, int):
+        elif isinstance(other, numbers.Number):
             return Coordinate(a / other if a is not None else None for a in self)
 
         else:
@@ -136,7 +137,7 @@ class Coordinate(tuple):
                 "division of Coordinate with type %s not supported" % type(other)
             )
 
-    def __truediv__(self, other: Union["Coordinate", int]) -> "Coordinate":
+    def __truediv__(self, other: Union["Coordinate", numbers.Number]) -> "Coordinate":
         if isinstance(other, Coordinate):
             assert (
                 self.dims == other.dims
@@ -147,7 +148,7 @@ class Coordinate(tuple):
                 for a, b in zip(self, other)
             )
 
-        elif isinstance(other, int):
+        elif isinstance(other, numbers.Number):
             return Coordinate(a / other if a is not None else None for a in self)
 
         else:
@@ -155,7 +156,7 @@ class Coordinate(tuple):
                 "division of Coordinate with type %s not supported" % type(other)
             )
 
-    def __floordiv__(self, other: Union["Coordinate", int]) -> "Coordinate":
+    def __floordiv__(self, other: Union["Coordinate", numbers.Number]) -> "Coordinate":
         if isinstance(other, Coordinate):
             assert (
                 self.dims == other.dims
@@ -166,7 +167,7 @@ class Coordinate(tuple):
                 for a, b in zip(self, other)
             )
 
-        elif isinstance(other, int):
+        elif isinstance(other, numbers.Number):
             return Coordinate(a // other if a is not None else None for a in self)
 
         else:
@@ -174,7 +175,7 @@ class Coordinate(tuple):
                 "division of Coordinate with type %s not supported" % type(other)
             )
 
-    def __mod__(self, other: Union["Coordinate", int]) -> "Coordinate":
+    def __mod__(self, other: Union["Coordinate", numbers.Number]) -> "Coordinate":
         if isinstance(other, Coordinate):
             assert (
                 self.dims == other.dims
@@ -185,7 +186,7 @@ class Coordinate(tuple):
                 for a, b in zip(self, other)
             )
 
-        elif isinstance(other, int):
+        elif isinstance(other, numbers.Number):
             return Coordinate(a % other if a is not None else None for a in self)
 
         else:
@@ -193,7 +194,7 @@ class Coordinate(tuple):
                 "mod of Coordinate with type %s not supported" % type(other)
             )
 
-    def __pow__(self, other: Union["Coordinate", int]) -> "Coordinate":
+    def __pow__(self, other: Union["Coordinate", numbers.Number]) -> "Coordinate":
         if isinstance(other, Coordinate):
             assert (
                 self.dims == other.dims
@@ -204,7 +205,7 @@ class Coordinate(tuple):
                 for a, b in zip(self, other)
             )
 
-        elif isinstance(other, int):
+        elif isinstance(other, numbers.Number):
             return Coordinate(a**other if a is not None else None for a in self)
 
         else:
