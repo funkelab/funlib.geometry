@@ -27,7 +27,7 @@ dev = ["pytest", "pytest-cov", "mypy", "ruff"]
 version = { attr = "funlib.geometry.__version__" }
 
 [tool.black]
-target_version = ['py38', 'py39', 'py310']
+target_version = ['py39', 'py310', 'py311']
 
 [tool.setuptools.packages.find]
 include = ["funlib.geometry*"]
