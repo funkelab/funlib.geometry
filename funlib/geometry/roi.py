@@ -464,6 +464,9 @@ class Roi(Freezable):
         return NotImplemented
 
     def __repr__(self) -> str:
+        return f"Roi({self.offset}, {self.shape})"
+    
+    def __str__(self) -> str:
         if self.empty:
             return "[empty ROI]"
         slices = ", ".join(
