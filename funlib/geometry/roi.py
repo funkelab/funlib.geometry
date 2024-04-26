@@ -2,7 +2,7 @@ from .coordinate import Coordinate
 from .freezable import Freezable
 
 import copy
-from typing import Iterable, Union, Optional
+from typing import Iterable, Union, Optional, Tuple
 import logging
 
 logger = logging.getLogger(__file__)
@@ -154,7 +154,7 @@ class Roi(Freezable):
     def get_center(self) -> Coordinate:
         return self.center
 
-    def to_slices(self) -> tuple[slice, ...]:
+    def to_slices(self) -> Tuple[slice, ...]:
         """Get a ``tuple`` of ``slice`` that represent this ROI and can be used
         to index arrays."""
         slices = []
@@ -171,7 +171,7 @@ class Roi(Freezable):
 
         return tuple(slices)
 
-    def get_bounding_box(self) -> tuple[slice, ...]:
+    def get_bounding_box(self) -> Tuple[slice, ...]:
         """Alias for ``to_slices()``."""
 
         return self.to_slices()
