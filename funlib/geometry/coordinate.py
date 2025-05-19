@@ -3,7 +3,7 @@ import numbers
 
 
 class Coordinate(tuple):
-    """A ``tuple`` of integers.
+    """A ``tuple`` of floats.
 
     Allows the following element-wise operators: addition, subtraction,
     multiplication, division, absolute value, and negation. All operations are
@@ -15,7 +15,7 @@ class Coordinate(tuple):
         size = shape*voxel_size # == Coordinate(20, 15, 4)
         size * 2 + 1 # == Coordinate(41, 31, 9)
 
-    Coordinates can be initialized with any iterable of ints, e.g.::
+    Coordinates can be initialized with any iterable of floats, e.g.::
 
         Coordinate((1,2,3))
         Coordinate([1,2,3])
@@ -30,7 +30,7 @@ class Coordinate(tuple):
         if len(array_like) == 1 and isinstance(array_like[0], Iterable):
             array_like = array_like[0]
         return super(Coordinate, cls).__new__(
-            cls, [int(x) if x is not None else None for x in array_like]
+            cls, array_like
         )
 
     @property

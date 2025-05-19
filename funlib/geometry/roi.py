@@ -154,23 +154,6 @@ class Roi(Freezable):
     def get_center(self) -> Coordinate:
         return self.center
 
-    def to_slices(self) -> Tuple[slice, ...]:
-        """Get a ``tuple`` of ``slice`` that represent this ROI and can be used
-        to index arrays."""
-        slices = []
-        for d in range(self.dims):
-            if self.__shape[d] is None:
-                s = slice(None, None)
-            elif self.__shape[d] == 0:
-                s = slice(None, 0)
-            else:
-                s = slice(
-                    int(self.__offset[d]), int(self.__offset[d] + self.__shape[d])
-                )
-            slices.append(s)
-
-        return tuple(slices)
-
     def get_bounding_box(self) -> Tuple[slice, ...]:
         """Alias for ``to_slices()``."""
 

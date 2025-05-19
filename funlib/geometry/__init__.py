@@ -1,5 +1,6 @@
 from .coordinate import Coordinate  # noqa
 from .roi import Roi  # noqa
+from .array import Array # noqa
 
 __major__ = 0
 __minor__ = 3
