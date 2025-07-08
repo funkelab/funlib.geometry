@@ -7,7 +7,7 @@ class Array:
     @classmethod
     def from_world(cls, world_offset: Coordinate, world_shape: Coordinate, voxel_size: Coordinate):
         world_roi = Roi(world_offset, world_shape)
-        return cls.__init__(world_roi, voxel_size)
+        return cls(world_roi, voxel_size)
     
     @classmethod
     def from_pixels(cls, pixel_shape: Coordinate, voxel_size: Coordinate, world_offset: Coordinate | None = None, pixel_offset: Coordinate | None = None):
@@ -20,7 +20,7 @@ class Array:
         world_shape = Coordinate(pixel_shape) * Coordinate(voxel_size)
         
         world_roi = Roi(world_offset, world_shape)
-        return cls.__init__(world_roi, voxel_size)
+        return cls(world_roi, voxel_size)
 
 
     def __init__(self, world_roi: Roi, voxel_size: Coordinate):
