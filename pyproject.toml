@@ -23,6 +23,16 @@ dependencies = []
 [project.optional-dependencies]
 dev = ["pytest", "pytest-cov", "mypy", "ruff", "numpy"]
 
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[tool.pixi.dependencies]
+python = ">=3.10,<3.14"
+
+[tool.pixi.pypi-dependencies]
+"funlib.geometry" = { path = ".", editable = true }
+
 [tool.setuptools.dynamic]
 version = { attr = "funlib.geometry.__version__" }
 
