@@ -202,7 +202,14 @@ class Roi(Freezable):
                 # gunpowder expects empty rois to contain empty
                 return self.empty or self.contains(other.begin)
 
-            return self.contains(other.begin) and self.contains(other.end - 1)
+            return all(
+                # if sb/se is None, then the dimension is unbounded and we do contain
+                # if sb/se is not None AND ob/oe is not None, then we check
+                # if sb/se is not None AND ob/oe is None, then other is unbounded and we do not contain
+                (sb is None or (ob is not None and ob >= sb))
+                and (se is None or (oe is not None and oe <= se))
+                for ob, oe, sb, se in zip(other.begin, other.end, self.begin, self.end)
+            )
 
         elif isinstance(other, Iterable):
             axis_containment = [
