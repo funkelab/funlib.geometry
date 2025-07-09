@@ -2,7 +2,7 @@
 authors = ["Caroline Malin-Mayor <malinmayorc@janelia.hhmi.org>"]
 channels = ["conda-forge"]
 name = "funlib.geometry"
-platforms = ["osx-arm64"]
+platforms = ["osx-arm64", "linux-64"]
 version = "0.1.0"
 
 [tasks]
