@@ -94,7 +94,7 @@ class Roi(Freezable):
         return self.__shape
 
     @shape.setter
-    def shape(self, shape: Iterable[Optional[int]]) -> None:
+    def shape(self, shape: Optional[Iterable[Optional[int]]]) -> None:
         """Set the shape of this ROI.
 
         Args:

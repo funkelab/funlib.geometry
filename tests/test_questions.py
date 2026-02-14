@@ -38,7 +38,7 @@ def test_roi_none_args():
     # Old behavior infered dimensionality of offset/shape based on
     # given shape/offset as long as one was provided
     with pytest.raises(Exception):
-        R(None, C(1, 2, 3))
+        R(None, C(1, 2, 3))  # type: ignore[arg-type]
 
 
 @pytest.mark.xfail
