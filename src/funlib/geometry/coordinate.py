@@ -137,6 +137,11 @@ class Coordinate(tuple):
 
     def __div__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
+            if type(self) is not type(other):
+                raise TypeError(
+                    f"cannot use / between {type(self).__name__} and "
+                    f"{type(other).__name__}; convert to the same type or use //"
+                )
             assert self.dims == other.dims, (
                 "can only divide Coordinate of equal dimensions"
             )
@@ -156,6 +161,11 @@ class Coordinate(tuple):
 
     def __truediv__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
+            if type(self) is not type(other):
+                raise TypeError(
+                    f"cannot use / between {type(self).__name__} and "
+                    f"{type(other).__name__}; convert to the same type or use //"
+                )
             assert self.dims == other.dims, (
                 "can only divide Coordinate of equal dimensions"
             )
