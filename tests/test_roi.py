@@ -1,6 +1,7 @@
-from funlib.geometry import Roi
-from funlib.geometry import Coordinate as Coord
 import pytest
+
+from funlib.geometry import Coordinate as Coord
+from funlib.geometry import Roi
 
 
 def test_squeeze():

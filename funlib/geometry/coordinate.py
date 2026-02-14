@@ -1,5 +1,5 @@
-from typing import Iterable, Any, Union
 import numbers
+from typing import Any, Iterable, Union
 
 
 class Coordinate(tuple):
@@ -65,9 +65,9 @@ class Coordinate(tuple):
 
     def __add__(self, other: Union[Any, "Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
-            assert (
-                self.dims == other.dims
-            ), "can only add Coordinate of equal dimensions"
+            assert self.dims == other.dims, (
+                "can only add Coordinate of equal dimensions"
+            )
             return Coordinate(
                 a + b if a is not None and b is not None else None
                 for a, b in zip(self, other)
@@ -83,9 +83,9 @@ class Coordinate(tuple):
 
     def __sub__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
-            assert (
-                self.dims == other.dims
-            ), "can only subtract Coordinate of equal dimensions"
+            assert self.dims == other.dims, (
+                "can only subtract Coordinate of equal dimensions"
+            )
             return Coordinate(
                 a - b if a is not None and b is not None else None
                 for a, b in zip(self, other)
@@ -101,9 +101,9 @@ class Coordinate(tuple):
 
     def __mul__(self, other: Union[Any, "Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
-            assert (
-                self.dims == other.dims
-            ), "can only multiply Coordinate of equal dimensions"
+            assert self.dims == other.dims, (
+                "can only multiply Coordinate of equal dimensions"
+            )
 
             return Coordinate(
                 a * b if a is not None and b is not None else None
@@ -120,9 +120,9 @@ class Coordinate(tuple):
 
     def __div__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
-            assert (
-                self.dims == other.dims
-            ), "can only divide Coordinate of equal dimensions"
+            assert self.dims == other.dims, (
+                "can only divide Coordinate of equal dimensions"
+            )
 
             return Coordinate(
                 a / b if a is not None and b is not None else None
@@ -139,9 +139,9 @@ class Coordinate(tuple):
 
     def __truediv__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
-            assert (
-                self.dims == other.dims
-            ), "can only divide Coordinate of equal dimensions"
+            assert self.dims == other.dims, (
+                "can only divide Coordinate of equal dimensions"
+            )
 
             return Coordinate(
                 a / b if a is not None and b is not None else None
@@ -158,9 +158,9 @@ class Coordinate(tuple):
 
     def __floordiv__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
-            assert (
-                self.dims == other.dims
-            ), "can only divide Coordinate of equal dimensions"
+            assert self.dims == other.dims, (
+                "can only divide Coordinate of equal dimensions"
+            )
 
             return Coordinate(
                 a // b if a is not None and b is not None else None
@@ -177,9 +177,9 @@ class Coordinate(tuple):
 
     def __mod__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
-            assert (
-                self.dims == other.dims
-            ), "can only mod Coordinate of equal dimensions"
+            assert self.dims == other.dims, (
+                "can only mod Coordinate of equal dimensions"
+            )
 
             return Coordinate(
                 a % b if a is not None and b is not None else None
@@ -196,9 +196,9 @@ class Coordinate(tuple):
 
     def __pow__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
-            assert (
-                self.dims == other.dims
-            ), "can only raise to Coordinate of equal dimensions"
+            assert self.dims == other.dims, (
+                "can only raise to Coordinate of equal dimensions"
+            )
 
             return Coordinate(
                 a**b if a is not None and b is not None else None

@@ -1,5 +1,7 @@
-from funlib.geometry import Coordinate as C, Roi as R
 import pytest
+
+from funlib.geometry import Coordinate as C
+from funlib.geometry import Roi as R
 
 
 def test_init():

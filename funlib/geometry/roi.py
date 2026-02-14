@@ -1,9 +1,9 @@
+import copy
+import logging
+from typing import Iterable, Optional, Tuple, Union
+
 from .coordinate import Coordinate
 from .freezable import Freezable
-
-import copy
-from typing import Iterable, Union, Optional, Tuple
-import logging
 
 logger = logging.getLogger(__file__)
 
@@ -118,11 +118,12 @@ class Roi(Freezable):
         """Ensure that offset and shape have same number of dimensions and
         offsets for unbounded or empty dimensions are None."""
 
-        assert (
-            self.__offset.dims == self.__shape.dims
-        ), "offset dimension %d != shape dimension %d" % (
-            self.__offset.dims,
-            self.__shape.dims,
+        assert self.__offset.dims == self.__shape.dims, (
+            "offset dimension %d != shape dimension %d"
+            % (
+                self.__offset.dims,
+                self.__shape.dims,
+            )
         )
 
         self.__offset = Coordinate(
@@ -318,9 +319,9 @@ class Roi(Freezable):
         if not isinstance(voxel_size, Coordinate):
             voxel_size = Coordinate(voxel_size)
 
-        assert (
-            voxel_size.dims == self.dims
-        ), "dimension of voxel size does not match ROI"
+        assert voxel_size.dims == self.dims, (
+            "dimension of voxel size does not match ROI"
+        )
 
         assert 0 not in voxel_size, "Voxel size cannot contain zero"
 
@@ -412,45 +413,45 @@ class Roi(Freezable):
         return max(x, y)
 
     def __add__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(
-            other, int
-        ), "can only add number or Coordinate to Roi"
+        assert isinstance(other, Coordinate) or isinstance(other, int), (
+            "can only add number or Coordinate to Roi"
+        )
         return self.shift(other)
 
     def __sub__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(
-            other, int
-        ), "can only subtract number or Coordinate from Roi"
+        assert isinstance(other, Coordinate) or isinstance(other, int), (
+            "can only subtract number or Coordinate from Roi"
+        )
         return self.shift(-other)
 
     def __mul__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(
-            other, int
-        ), "can only multiply with a number or Coordinate"
+        assert isinstance(other, Coordinate) or isinstance(other, int), (
+            "can only multiply with a number or Coordinate"
+        )
         return Roi(self.__offset * other, self.__shape * other)
 
     def __div__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(
-            other, int
-        ), "can only divide by a number or Coordinate"
+        assert isinstance(other, Coordinate) or isinstance(other, int), (
+            "can only divide by a number or Coordinate"
+        )
         return Roi(self.__offset / other, self.__shape / other)
 
     def __truediv__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(
-            other, int
-        ), "can only divide by a number or Coordinate"
+        assert isinstance(other, Coordinate) or isinstance(other, int), (
+            "can only divide by a number or Coordinate"
+        )
         return Roi(self.__offset / other, self.__shape / other)
 
     def __floordiv__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(
-            other, int
-        ), "can only divide by a number or Coordinate"
+        assert isinstance(other, Coordinate) or isinstance(other, int), (
+            "can only divide by a number or Coordinate"
+        )
         return Roi(self.__offset // other, self.__shape // other)
 
     def __mod__(self, other: Union["Coordinate", int]) -> "Roi":  # pragma: py3 no cover
-        assert isinstance(other, Coordinate) or isinstance(
-            other, int
-        ), "can only mod by a number or Coordinate"
+        assert isinstance(other, Coordinate) or isinstance(other, int), (
+            "can only mod by a number or Coordinate"
+        )
         return Roi(self.__offset % other, self.__shape % other)
 
     def __eq__(self, other: object) -> bool:
@@ -465,7 +466,7 @@ class Roi(Freezable):
 
     def __repr__(self) -> str:
         return f"Roi({self.offset}, {self.shape})"
-    
+
     def __str__(self) -> str:
         if self.empty:
             return "[empty ROI]"

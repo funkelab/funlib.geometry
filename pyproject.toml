@@ -16,12 +16,12 @@ dynamic = ["version"]
 
 classifiers = ["Programming Language :: Python :: 3"]
 keywords = []
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 
 dependencies = []
 
-[project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "mypy", "ruff"]
+[dependency-groups]
+dev = ["pytest", "pytest-cov", "ruff", "ty"]
 
 [tool.setuptools.dynamic]
 version = { attr = "funlib.geometry.__version__" }
