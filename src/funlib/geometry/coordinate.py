@@ -29,21 +29,38 @@ class Coordinate(tuple):
     def __new__(cls, *array_like):
         if len(array_like) == 1 and isinstance(array_like[0], Iterable):
             array_like = array_like[0]
-        return super(Coordinate, cls).__new__(
+        return tuple.__new__(
             cls, [int(x) if x is not None else None for x in array_like]
         )
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, (tuple, list)):
+            return NotImplemented
+        if len(self) != len(other):
+            return False
+        return all(
+            (a is None and b is None) or (a is not None and b is not None and a == b)
+            for a, b in zip(self, other)
+        )
+
+    def __hash__(self) -> int:
+        return hash(tuple(self))
 
     @property
     def dims(self) -> int:
         return len(self)
 
     def squeeze(self, dim: int = 0) -> "Coordinate":
-        return Coordinate(c for i, c in enumerate(self) if i != dim)
+        return type(self)(c for i, c in enumerate(self) if i != dim)
 
     def is_multiple_of(self, coordinate: "Coordinate") -> bool:
         """Test if this coordinate is a multiple of the given coordinate."""
 
         return all([a % b == 0 for a, b in zip(self, coordinate)])
+
+    def round(self) -> "Coordinate":
+        """Round to nearest integer and convert to Coordinate."""
+        return Coordinate(int(round(a)) if a is not None else None for a in self)
 
     def round_division(self, other: "Coordinate") -> "Coordinate":
         """
@@ -58,23 +75,23 @@ class Coordinate(tuple):
         return (self + other - 1) // other
 
     def __neg__(self) -> "Coordinate":
-        return Coordinate(-a if a is not None else None for a in self)
+        return type(self)(-a if a is not None else None for a in self)
 
     def __abs__(self) -> "Coordinate":
-        return Coordinate(abs(a) if a is not None else None for a in self)
+        return type(self)(abs(a) if a is not None else None for a in self)
 
     def __add__(self, other: Union[Any, "Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
             assert self.dims == other.dims, (
                 "can only add Coordinate of equal dimensions"
             )
-            return Coordinate(
+            return type(self)(
                 a + b if a is not None and b is not None else None
                 for a, b in zip(self, other)
             )
 
         elif isinstance(other, numbers.Number):
-            return Coordinate(a + other if a is not None else None for a in self)
+            return type(self)(a + other if a is not None else None for a in self)
 
         else:
             raise TypeError(
@@ -86,13 +103,13 @@ class Coordinate(tuple):
             assert self.dims == other.dims, (
                 "can only subtract Coordinate of equal dimensions"
             )
-            return Coordinate(
+            return type(self)(
                 a - b if a is not None and b is not None else None
                 for a, b in zip(self, other)
             )
 
         elif isinstance(other, numbers.Number):
-            return Coordinate(a - other if a is not None else None for a in self)
+            return type(self)(a - other if a is not None else None for a in self)
 
         else:
             raise TypeError(
@@ -105,13 +122,13 @@ class Coordinate(tuple):
                 "can only multiply Coordinate of equal dimensions"
             )
 
-            return Coordinate(
+            return type(self)(
                 a * b if a is not None and b is not None else None
                 for a, b in zip(self, other)
             )
 
         elif isinstance(other, numbers.Number):
-            return Coordinate(a * other if a is not None else None for a in self)
+            return type(self)(a * other if a is not None else None for a in self)
 
         else:
             raise TypeError(
@@ -124,13 +141,13 @@ class Coordinate(tuple):
                 "can only divide Coordinate of equal dimensions"
             )
 
-            return Coordinate(
+            return type(self)(
                 a / b if a is not None and b is not None else None
                 for a, b in zip(self, other)
             )
 
         elif isinstance(other, numbers.Number):
-            return Coordinate(a / other if a is not None else None for a in self)
+            return type(self)(a / other if a is not None else None for a in self)
 
         else:
             raise TypeError(
@@ -143,13 +160,13 @@ class Coordinate(tuple):
                 "can only divide Coordinate of equal dimensions"
             )
 
-            return Coordinate(
+            return type(self)(
                 a / b if a is not None and b is not None else None
                 for a, b in zip(self, other)
             )
 
         elif isinstance(other, numbers.Number):
-            return Coordinate(a / other if a is not None else None for a in self)
+            return type(self)(a / other if a is not None else None for a in self)
 
         else:
             raise TypeError(
@@ -162,13 +179,13 @@ class Coordinate(tuple):
                 "can only divide Coordinate of equal dimensions"
             )
 
-            return Coordinate(
+            return type(self)(
                 a // b if a is not None and b is not None else None
                 for a, b in zip(self, other)
             )
 
         elif isinstance(other, numbers.Number):
-            return Coordinate(a // other if a is not None else None for a in self)
+            return type(self)(a // other if a is not None else None for a in self)
 
         else:
             raise TypeError(
@@ -181,13 +198,13 @@ class Coordinate(tuple):
                 "can only mod Coordinate of equal dimensions"
             )
 
-            return Coordinate(
+            return type(self)(
                 a % b if a is not None and b is not None else None
                 for a, b in zip(self, other)
             )
 
         elif isinstance(other, numbers.Number):
-            return Coordinate(a % other if a is not None else None for a in self)
+            return type(self)(a % other if a is not None else None for a in self)
 
         else:
             raise TypeError(
@@ -200,13 +217,13 @@ class Coordinate(tuple):
                 "can only raise to Coordinate of equal dimensions"
             )
 
-            return Coordinate(
+            return type(self)(
                 a**b if a is not None and b is not None else None
                 for a, b in zip(self, other)
             )
 
         elif isinstance(other, numbers.Number):
-            return Coordinate(a**other if a is not None else None for a in self)
+            return type(self)(a**other if a is not None else None for a in self)
 
         else:
             raise TypeError(

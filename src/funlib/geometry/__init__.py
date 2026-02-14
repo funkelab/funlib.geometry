@@ -1,4 +1,6 @@
 from .coordinate import Coordinate  # noqa
+from .float_coordinate import FloatCoordinate  # noqa
+from .float_roi import FloatRoi  # noqa
 from .roi import Roi  # noqa
 
 __major__ = 0

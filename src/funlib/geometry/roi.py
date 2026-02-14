@@ -1,5 +1,6 @@
 import copy
 import logging
+import numbers
 from typing import Iterable, Optional, Tuple, Union
 
 from .coordinate import Coordinate
@@ -55,22 +56,28 @@ class Roi(Freezable):
             unboundedness.
     """
 
-    def __init__(self, offset: Iterable[Optional[int]], shape: Iterable[Optional[int]]):
-        self.__offset = Coordinate(offset)
-        self.__shape = Coordinate(shape)
+    _coord_type = Coordinate
+
+    def __init__(
+        self,
+        offset: Iterable[Optional[Union[int, float]]],
+        shape: Iterable[Optional[Union[int, float]]],
+    ):
+        self.__offset = self._coord_type(offset)
+        self.__shape = self._coord_type(shape)
         self.freeze()
 
         self.__consolidate_offset()
 
     def squeeze(self, dim: int = 0) -> "Roi":
-        return Roi(self.offset.squeeze(dim), self.shape.squeeze(dim))
+        return type(self)(self.offset.squeeze(dim), self.shape.squeeze(dim))
 
     @property
     def offset(self) -> Coordinate:
         return self.__offset
 
     @offset.setter
-    def offset(self, offset: Iterable[Optional[int]]) -> None:
+    def offset(self, offset: Iterable[Optional[Union[int, float]]]) -> None:
         """Set the offset of this Roi.
 
         Args:
@@ -80,21 +87,21 @@ class Roi(Freezable):
                 unboundedness or empty ROI.
         """
 
-        self.__offset = Coordinate(offset)
+        self.__offset = self._coord_type(offset)
         self.__consolidate_offset()
 
     def get_offset(self) -> Coordinate:
         return self.offset
 
-    def set_offset(self, new_offset: Iterable[Optional[int]]) -> None:
-        self.offset = Coordinate(new_offset)
+    def set_offset(self, new_offset: Iterable[Optional[Union[int, float]]]) -> None:
+        self.offset = self._coord_type(new_offset)
 
     @property
     def shape(self) -> Coordinate:
         return self.__shape
 
     @shape.setter
-    def shape(self, shape: Optional[Iterable[Optional[int]]]) -> None:
+    def shape(self, shape: Optional[Iterable[Optional[Union[int, float]]]]) -> None:
         """Set the shape of this ROI.
 
         Args:
@@ -105,14 +112,14 @@ class Roi(Freezable):
                 unboundedness.
         """
 
-        self.__shape = Coordinate(shape)
+        self.__shape = self._coord_type(shape)
         self.__consolidate_offset()
 
     def get_shape(self) -> Coordinate:
         return self.shape
 
-    def set_shape(self, new_shape: Iterable[Optional[int]]) -> None:
-        self.shape = Coordinate(new_shape)
+    def set_shape(self, new_shape: Iterable[Optional[Union[int, float]]]) -> None:
+        self.shape = self._coord_type(new_shape)
 
     def __consolidate_offset(self) -> None:
         """Ensure that offset and shape have same number of dimensions and
@@ -126,7 +133,7 @@ class Roi(Freezable):
             )
         )
 
-        self.__offset = Coordinate(
+        self.__offset = self._coord_type(
             (o if s is not None else None for o, s in zip(self.__offset, self.__shape))
         )
 
@@ -155,6 +162,13 @@ class Roi(Freezable):
     def get_center(self) -> Coordinate:
         return self.center
 
+    @property
+    def true_center(self):
+        """Get the true center of this ROI with floating point division."""
+        from .float_coordinate import FloatCoordinate
+
+        return FloatCoordinate(self.offset) + FloatCoordinate(self.shape) / 2
+
     def to_slices(self) -> Tuple[slice, ...]:
         """Get a ``tuple`` of ``slice`` that represent this ROI and can be used
         to index arrays."""
@@ -165,9 +179,16 @@ class Roi(Freezable):
             elif self.__shape[d] == 0:
                 s = slice(None, 0)
             else:
-                s = slice(
-                    int(self.__offset[d]), int(self.__offset[d] + self.__shape[d])
+                fstart = self.__offset[d]
+                fstop = self.__offset[d] + self.__shape[d]
+                start, stop = int(fstart), int(fstop)
+                assert abs(fstart - start) < 1e-4, (
+                    f"offset {fstart} must be near-integer for slicing"
                 )
+                assert abs(fstop - stop) < 1e-4, (
+                    f"end {fstop} must be near-integer for slicing"
+                )
+                s = slice(start, stop)
             slices.append(s)
 
         return tuple(slices)
@@ -265,16 +286,16 @@ class Roi(Freezable):
         """Get the intersection of this ROI with another :class:`Roi`."""
 
         if not self.intersects(other):
-            return Roi((None,) * self.dims, (0,) * self.dims)  # empty ROI
+            return type(self)((None,) * self.dims, (0,) * self.dims)  # empty ROI
 
-        begin = Coordinate(
+        begin = self._coord_type(
             (self.__left_max(b1, b2) for b1, b2 in zip(self.begin, other.begin))
         )
-        end = Coordinate(
+        end = self._coord_type(
             (self.__right_min(e1, e2) for e1, e2 in zip(self.end, other.end))
         )
 
-        return Roi(begin, end - begin)
+        return type(self)(begin, end - begin)
 
     def union(self, other: "Roi") -> "Roi":
         """Get the union of this ROI with another :class:`Roi`."""
@@ -285,19 +306,19 @@ class Roi(Freezable):
         if other.empty:
             return self
 
-        begin = Coordinate(
+        begin = self._coord_type(
             (self.__left_min(b1, b2) for b1, b2 in zip(self.begin, other.begin))
         )
-        end = Coordinate(
+        end = self._coord_type(
             (self.__right_max(e1, e2) for e1, e2 in zip(self.end, other.end))
         )
 
-        return Roi(begin, end - begin)
+        return type(self)(begin, end - begin)
 
-    def shift(self, by: Union["Coordinate", int]) -> "Roi":
+    def shift(self, by: Union["Coordinate", int, float]) -> "Roi":
         """Shift this ROI."""
 
-        return Roi(self.__offset + by, self.__shape)
+        return type(self)(self.__offset + by, self.__shape)
 
     def snap_to_grid(
         self, voxel_size: Iterable[Optional[int]], mode: str = "grow"
@@ -317,7 +338,7 @@ class Roi(Freezable):
                 to 'grow'.
         """
         if not isinstance(voxel_size, Coordinate):
-            voxel_size = Coordinate(voxel_size)
+            voxel_size = self._coord_type(voxel_size)
 
         assert voxel_size.dims == self.dims, (
             "dimension of voxel size does not match ROI"
@@ -337,7 +358,7 @@ class Roi(Freezable):
         else:
             raise RuntimeError("Unknown mode %s for snap_to_grid" % mode)
 
-        return Roi(
+        return type(self)(
             begin_in_voxel * voxel_size, (end_in_voxel - begin_in_voxel) * voxel_size
         )
 
@@ -363,18 +384,18 @@ class Roi(Freezable):
                 dimensions. Defaults to zero.
         """
         if isinstance(amount_neg, Iterable):
-            _amount_neg: Union[Coordinate, int] = Coordinate(amount_neg)
+            _amount_neg: Union[Coordinate, int] = self._coord_type(amount_neg)
         else:
             _amount_neg = amount_neg
         if isinstance(amount_pos, Iterable):
-            _amount_pos: Union[Coordinate, int] = Coordinate(amount_pos)
+            _amount_pos: Union[Coordinate, int] = self._coord_type(amount_pos)
         else:
             _amount_pos = amount_pos
 
         offset = self.__offset - _amount_neg
         shape = self.__shape + _amount_neg + _amount_pos
 
-        return Roi(offset, shape)
+        return type(self)(offset, shape)
 
     def copy(self) -> "Roi":
         """Create a copy of this ROI."""
@@ -412,47 +433,49 @@ class Roi(Freezable):
             return None
         return max(x, y)
 
-    def __add__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(other, int), (
+    def __add__(self, other: Union["Coordinate", int, float]) -> "Roi":
+        assert isinstance(other, (Coordinate, numbers.Number)), (
             "can only add number or Coordinate to Roi"
         )
         return self.shift(other)
 
-    def __sub__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(other, int), (
+    def __sub__(self, other: Union["Coordinate", int, float]) -> "Roi":
+        assert isinstance(other, (Coordinate, numbers.Number)), (
             "can only subtract number or Coordinate from Roi"
         )
         return self.shift(-other)
 
-    def __mul__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(other, int), (
+    def __mul__(self, other: Union["Coordinate", int, float]) -> "Roi":
+        assert isinstance(other, (Coordinate, numbers.Number)), (
             "can only multiply with a number or Coordinate"
         )
-        return Roi(self.__offset * other, self.__shape * other)
+        return type(self)(self.__offset * other, self.__shape * other)
 
-    def __div__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(other, int), (
+    def __div__(self, other: Union["Coordinate", int, float]) -> "Roi":
+        assert isinstance(other, (Coordinate, numbers.Number)), (
             "can only divide by a number or Coordinate"
         )
-        return Roi(self.__offset / other, self.__shape / other)
+        return type(self)(self.__offset / other, self.__shape / other)
 
-    def __truediv__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(other, int), (
+    def __truediv__(self, other: Union["Coordinate", int, float]) -> "Roi":
+        assert isinstance(other, (Coordinate, numbers.Number)), (
             "can only divide by a number or Coordinate"
         )
-        return Roi(self.__offset / other, self.__shape / other)
+        return type(self)(self.__offset / other, self.__shape / other)
 
-    def __floordiv__(self, other: Union["Coordinate", int]) -> "Roi":
-        assert isinstance(other, Coordinate) or isinstance(other, int), (
+    def __floordiv__(self, other: Union["Coordinate", int, float]) -> "Roi":
+        assert isinstance(other, (Coordinate, numbers.Number)), (
             "can only divide by a number or Coordinate"
         )
-        return Roi(self.__offset // other, self.__shape // other)
+        return type(self)(self.__offset // other, self.__shape // other)
 
-    def __mod__(self, other: Union["Coordinate", int]) -> "Roi":  # pragma: py3 no cover
-        assert isinstance(other, Coordinate) or isinstance(other, int), (
+    def __mod__(
+        self, other: Union["Coordinate", int, float]
+    ) -> "Roi":  # pragma: py3 no cover
+        assert isinstance(other, (Coordinate, numbers.Number)), (
             "can only mod by a number or Coordinate"
         )
-        return Roi(self.__offset % other, self.__shape % other)
+        return type(self)(self.__offset % other, self.__shape % other)
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Roi):
@@ -465,7 +488,7 @@ class Roi(Freezable):
         return NotImplemented
 
     def __repr__(self) -> str:
-        return f"Roi({self.offset}, {self.shape})"
+        return f"{type(self).__name__}({self.offset}, {self.shape})"
 
     def __str__(self) -> str:
         if self.empty:
