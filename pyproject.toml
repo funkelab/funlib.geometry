@@ -26,11 +26,5 @@ dev = ["pytest", "pytest-cov", "mypy", "ruff"]
 [tool.setuptools.dynamic]
 version = { attr = "funlib.geometry.__version__" }
 
-[tool.black]
-target_version = ['py39', 'py310', 'py311']
-
-[tool.setuptools.packages.find]
-include = ["funlib.geometry*"]
-
 [tool.setuptools.package-data]
 "funlib.geometry" = ["py.typed"]
