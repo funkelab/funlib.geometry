@@ -21,7 +21,12 @@ requires-python = ">=3.9"
 dependencies = []
 
 [dependency-groups]
-dev = ["pytest", "pytest-cov", "ruff", "ty"]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.15.1",
+    "ty>=0.0.17",
+]
 
 [tool.setuptools.dynamic]
 version = { attr = "funlib.geometry.__version__" }
