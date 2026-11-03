@@ -120,11 +120,8 @@ class Roi(Freezable):
         offsets for unbounded or empty dimensions are None."""
 
         assert self.__offset.dims == self.__shape.dims, (
-            "offset dimension %d != shape dimension %d"
-            % (
-                self.__offset.dims,
-                self.__shape.dims,
-            )
+            f"offset dimension {self.__offset.dims} != "
+            f"shape dimension {self.__shape.dims}"
         )
 
         self.__offset = Coordinate(
