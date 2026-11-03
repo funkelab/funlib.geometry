@@ -1,5 +1,6 @@
 import numbers
-from typing import Any, Iterable, Union
+from collections.abc import Iterable
+from typing import Any, Union
 
 
 class Coordinate(tuple):
@@ -29,7 +30,7 @@ class Coordinate(tuple):
     def __new__(cls, *array_like):
         if len(array_like) == 1 and isinstance(array_like[0], Iterable):
             array_like = array_like[0]
-        return super(Coordinate, cls).__new__(
+        return super().__new__(
             cls, [int(x) if x is not None else None for x in array_like]
         )
 
@@ -43,7 +44,7 @@ class Coordinate(tuple):
     def is_multiple_of(self, coordinate: "Coordinate") -> bool:
         """Test if this coordinate is a multiple of the given coordinate."""
 
-        return all([a % b == 0 for a, b in zip(self, coordinate)])
+        return all([a % b == 0 for a, b in zip(self, coordinate, strict=False)])
 
     def round_division(self, other: "Coordinate") -> "Coordinate":
         """
@@ -70,7 +71,7 @@ class Coordinate(tuple):
             )
             return Coordinate(
                 a + b if a is not None and b is not None else None
-                for a, b in zip(self, other)
+                for a, b in zip(self, other, strict=False)
             )
 
         elif isinstance(other, numbers.Number):
@@ -78,7 +79,7 @@ class Coordinate(tuple):
 
         else:
             raise TypeError(
-                "addition of Coordinate with type %s not supported" % type(other)
+                f"addition of Coordinate with type {type(other)} not supported"
             )
 
     def __sub__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
@@ -88,7 +89,7 @@ class Coordinate(tuple):
             )
             return Coordinate(
                 a - b if a is not None and b is not None else None
-                for a, b in zip(self, other)
+                for a, b in zip(self, other, strict=False)
             )
 
         elif isinstance(other, numbers.Number):
@@ -96,7 +97,7 @@ class Coordinate(tuple):
 
         else:
             raise TypeError(
-                "subtraction of Coordinate with type %s not supported" % type(other)
+                f"subtraction of Coordinate with type {type(other)} not supported"
             )
 
     def __mul__(self, other: Union[Any, "Coordinate", int, float]) -> "Coordinate":
@@ -107,7 +108,7 @@ class Coordinate(tuple):
 
             return Coordinate(
                 a * b if a is not None and b is not None else None
-                for a, b in zip(self, other)
+                for a, b in zip(self, other, strict=False)
             )
 
         elif isinstance(other, numbers.Number):
@@ -115,7 +116,7 @@ class Coordinate(tuple):
 
         else:
             raise TypeError(
-                "multiplication of Coordinate with type %s not supported" % type(other)
+                f"multiplication of Coordinate with type {type(other)} not supported"
             )
 
     def __div__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
@@ -126,7 +127,7 @@ class Coordinate(tuple):
 
             return Coordinate(
                 a / b if a is not None and b is not None else None
-                for a, b in zip(self, other)
+                for a, b in zip(self, other, strict=False)
             )
 
         elif isinstance(other, numbers.Number):
@@ -134,7 +135,7 @@ class Coordinate(tuple):
 
         else:
             raise TypeError(
-                "division of Coordinate with type %s not supported" % type(other)
+                f"division of Coordinate with type {type(other)} not supported"
             )
 
     def __truediv__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
@@ -145,7 +146,7 @@ class Coordinate(tuple):
 
             return Coordinate(
                 a / b if a is not None and b is not None else None
-                for a, b in zip(self, other)
+                for a, b in zip(self, other, strict=False)
             )
 
         elif isinstance(other, numbers.Number):
@@ -153,7 +154,7 @@ class Coordinate(tuple):
 
         else:
             raise TypeError(
-                "division of Coordinate with type %s not supported" % type(other)
+                f"division of Coordinate with type {type(other)} not supported"
             )
 
     def __floordiv__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
@@ -164,7 +165,7 @@ class Coordinate(tuple):
 
             return Coordinate(
                 a // b if a is not None and b is not None else None
-                for a, b in zip(self, other)
+                for a, b in zip(self, other, strict=False)
             )
 
         elif isinstance(other, numbers.Number):
@@ -172,7 +173,7 @@ class Coordinate(tuple):
 
         else:
             raise TypeError(
-                "division of Coordinate with type %s not supported" % type(other)
+                f"division of Coordinate with type {type(other)} not supported"
             )
 
     def __mod__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
@@ -183,16 +184,14 @@ class Coordinate(tuple):
 
             return Coordinate(
                 a % b if a is not None and b is not None else None
-                for a, b in zip(self, other)
+                for a, b in zip(self, other, strict=False)
             )
 
         elif isinstance(other, numbers.Number):
             return Coordinate(a % other if a is not None else None for a in self)
 
         else:
-            raise TypeError(
-                "mod of Coordinate with type %s not supported" % type(other)
-            )
+            raise TypeError(f"mod of Coordinate with type {type(other)} not supported")
 
     def __pow__(self, other: Union["Coordinate", int, float]) -> "Coordinate":
         if isinstance(other, Coordinate):
@@ -202,13 +201,11 @@ class Coordinate(tuple):
 
             return Coordinate(
                 a**b if a is not None and b is not None else None
-                for a, b in zip(self, other)
+                for a, b in zip(self, other, strict=False)
             )
 
         elif isinstance(other, numbers.Number):
             return Coordinate(a**other if a is not None else None for a in self)
 
         else:
-            raise TypeError(
-                "raising Coordinate with type %s not supported" % type(other)
-            )
+            raise TypeError(f"raising Coordinate with type {type(other)} not supported")

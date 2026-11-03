@@ -5,4 +5,4 @@ __major__ = 0
 __minor__ = 3
 __patch__ = 0
 __tag__ = ""
-__version__ = "{}.{}.{}{}".format(__major__, __minor__, __patch__, __tag__).strip(".")
+__version__ = f"{__major__}.{__minor__}.{__patch__}{__tag__}".strip(".")
