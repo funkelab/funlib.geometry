@@ -46,13 +46,13 @@ def test_arithmetic():
     with pytest.raises(TypeError):
         a + "invalid"
     with pytest.raises(TypeError):
-        a - "invalid"  # type: ignore[operator]
+        a - "invalid"  # ty: ignore[unsupported-operator]  # intentional misuse
     with pytest.raises(TypeError):
         a * "invalid"
     with pytest.raises(TypeError):
-        a / "invalid"  # type: ignore[operator]
+        a / "invalid"  # ty: ignore[unsupported-operator]  # intentional misuse
     with pytest.raises(TypeError):
-        a // "invalid"  # type: ignore[operator]
+        a // "invalid"  # ty: ignore[unsupported-operator]  # intentional misuse
     with pytest.raises(AssertionError):
         a + c
     with pytest.raises(AssertionError):

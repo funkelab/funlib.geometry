@@ -24,8 +24,9 @@ dependencies = []
 dev = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
-    "ruff>=0.15.1",
-    "ty>=0.0.17",
+    # pinned with == until uv.lock is committed: both change their rule sets between releases
+    "ruff==0.17.3",
+    "ty==0.0.96",
 ]
 
 [tool.setuptools.dynamic]
@@ -33,6 +34,10 @@ version = { attr = "funlib.geometry.__version__" }
 
 [tool.setuptools.package-data]
 "funlib.geometry" = ["py.typed"]
+
+[tool.ty.src]
+include = ["src", "tests"]
+exclude = []  # only ever shrinks
 
 [tool.ruff]
 line-length = 88
