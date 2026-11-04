@@ -24,8 +24,9 @@ dependencies = []
 dev = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
-    "ruff>=0.15.1",
-    "ty>=0.0.17",
+    # pinned with == until uv.lock is committed: both change their rule sets between releases
+    "ruff==0.17.3",
+    "ty==0.0.96",
 ]
 
 [tool.setuptools.dynamic]
@@ -34,11 +35,19 @@ version = { attr = "funlib.geometry.__version__" }
 [tool.setuptools.package-data]
 "funlib.geometry" = ["py.typed"]
 
+[tool.ty.src]
+include = ["src", "tests"]
+exclude = []  # only ever shrinks
+
 [tool.ruff]
-# ruff >= 0.16 also formats Python code fences in Markdown; keep the README's
-# hand-aligned result comments as they are.
-extend-exclude = ["*.md"]
+line-length = 88
+extend-exclude = ["docs/build", "*.md"]
 
 [tool.ruff.lint]
-# ruff's pre-0.16 default rule set, pinned so it does not drift with releases
-select = ["E4", "E7", "E9", "F"]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]  # the formatter owns line length
+
+[tool.ruff.lint.per-file-ignores]
+"tutorials/**/*.py" = ["E402"]  # jupytext cells import mid-file
+"examples/**/*.py" = ["E402"]
+"__init__.py" = ["F401"]  # re-exports

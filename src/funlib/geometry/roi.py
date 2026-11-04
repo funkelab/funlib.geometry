@@ -1,6 +1,7 @@
 import copy
 import logging
-from typing import Iterable, Optional, Tuple, Union
+from collections.abc import Iterable
+from typing import Union
 
 from .coordinate import Coordinate
 from .freezable import Freezable
@@ -55,7 +56,7 @@ class Roi(Freezable):
             unboundedness.
     """
 
-    def __init__(self, offset: Iterable[Optional[int]], shape: Iterable[Optional[int]]):
+    def __init__(self, offset: Iterable[int | None], shape: Iterable[int | None]):
         self.__offset = Coordinate(offset)
         self.__shape = Coordinate(shape)
         self.freeze()
@@ -70,7 +71,7 @@ class Roi(Freezable):
         return self.__offset
 
     @offset.setter
-    def offset(self, offset: Iterable[Optional[int]]) -> None:
+    def offset(self, offset: Iterable[int | None]) -> None:
         """Set the offset of this Roi.
 
         Args:
@@ -86,7 +87,7 @@ class Roi(Freezable):
     def get_offset(self) -> Coordinate:
         return self.offset
 
-    def set_offset(self, new_offset: Iterable[Optional[int]]) -> None:
+    def set_offset(self, new_offset: Iterable[int | None]) -> None:
         self.offset = Coordinate(new_offset)
 
     @property
@@ -94,7 +95,7 @@ class Roi(Freezable):
         return self.__shape
 
     @shape.setter
-    def shape(self, shape: Optional[Iterable[Optional[int]]]) -> None:
+    def shape(self, shape: Iterable[int | None] | None) -> None:
         """Set the shape of this ROI.
 
         Args:
@@ -111,7 +112,7 @@ class Roi(Freezable):
     def get_shape(self) -> Coordinate:
         return self.shape
 
-    def set_shape(self, new_shape: Iterable[Optional[int]]) -> None:
+    def set_shape(self, new_shape: Iterable[int | None]) -> None:
         self.shape = Coordinate(new_shape)
 
     def __consolidate_offset(self) -> None:
@@ -119,15 +120,15 @@ class Roi(Freezable):
         offsets for unbounded or empty dimensions are None."""
 
         assert self.__offset.dims == self.__shape.dims, (
-            "offset dimension %d != shape dimension %d"
-            % (
-                self.__offset.dims,
-                self.__shape.dims,
-            )
+            f"offset dimension {self.__offset.dims} != "
+            f"shape dimension {self.__shape.dims}"
         )
 
         self.__offset = Coordinate(
-            (o if s is not None else None for o, s in zip(self.__offset, self.__shape))
+            (
+                o if s is not None else None
+                for o, s in zip(self.__offset, self.__shape, strict=False)
+            )
         )
 
     @property
@@ -155,7 +156,7 @@ class Roi(Freezable):
     def get_center(self) -> Coordinate:
         return self.center
 
-    def to_slices(self) -> Tuple[slice, ...]:
+    def to_slices(self) -> tuple[slice, ...]:
         """Get a ``tuple`` of ``slice`` that represent this ROI and can be used
         to index arrays."""
         slices = []
@@ -172,7 +173,7 @@ class Roi(Freezable):
 
         return tuple(slices)
 
-    def get_bounding_box(self) -> Tuple[slice, ...]:
+    def get_bounding_box(self) -> tuple[slice, ...]:
         """Alias for ``to_slices()``."""
 
         return self.to_slices()
@@ -184,7 +185,7 @@ class Roi(Freezable):
         return self.__shape.dims
 
     @property
-    def size(self) -> Optional[int]:
+    def size(self) -> int | None:
         """Get the volume of this ROI. Returns ``None`` if the ROI is
         unbounded."""
 
@@ -196,7 +197,7 @@ class Roi(Freezable):
             size *= d
         return size
 
-    def get_size(self) -> Optional[int]:
+    def get_size(self) -> int | None:
         return self.size
 
     @property
@@ -211,7 +212,7 @@ class Roi(Freezable):
 
         return None in self.__shape
 
-    def contains(self, other: Union["Roi", Iterable[Optional[int]]]) -> bool:
+    def contains(self, other: Union["Roi", Iterable[int | None]]) -> bool:
         """Test if this ROI contains ``other``, which can be another
         :class:`Roi`, :class:`Coordinate`, or ``tuple``."""
 
@@ -226,7 +227,7 @@ class Roi(Freezable):
             axis_containment = [
                 (b is None or (p is not None and p >= b))
                 and (e is None or (p is not None and p < e))
-                for p, b, e in zip(other, self.begin, self.end)
+                for p, b, e in zip(other, self.begin, self.end, strict=False)
             ]
             return len(axis_containment) == self.dims and all(axis_containment)
         else:
@@ -255,7 +256,9 @@ class Roi(Freezable):
                     # or b2 starts after e1
                     (b2 >= e1)
                 )
-                for b1, b2, e1, e2 in zip(self.begin, other.begin, self.end, other.end)
+                for b1, b2, e1, e2 in zip(
+                    self.begin, other.begin, self.end, other.end, strict=False
+                )
             ]
         )
 
@@ -268,10 +271,16 @@ class Roi(Freezable):
             return Roi((None,) * self.dims, (0,) * self.dims)  # empty ROI
 
         begin = Coordinate(
-            (self.__left_max(b1, b2) for b1, b2 in zip(self.begin, other.begin))
+            (
+                self.__left_max(b1, b2)
+                for b1, b2 in zip(self.begin, other.begin, strict=False)
+            )
         )
         end = Coordinate(
-            (self.__right_min(e1, e2) for e1, e2 in zip(self.end, other.end))
+            (
+                self.__right_min(e1, e2)
+                for e1, e2 in zip(self.end, other.end, strict=False)
+            )
         )
 
         return Roi(begin, end - begin)
@@ -286,10 +295,16 @@ class Roi(Freezable):
             return self
 
         begin = Coordinate(
-            (self.__left_min(b1, b2) for b1, b2 in zip(self.begin, other.begin))
+            (
+                self.__left_min(b1, b2)
+                for b1, b2 in zip(self.begin, other.begin, strict=False)
+            )
         )
         end = Coordinate(
-            (self.__right_max(e1, e2) for e1, e2 in zip(self.end, other.end))
+            (
+                self.__right_max(e1, e2)
+                for e1, e2 in zip(self.end, other.end, strict=False)
+            )
         )
 
         return Roi(begin, end - begin)
@@ -300,7 +315,7 @@ class Roi(Freezable):
         return Roi(self.__offset + by, self.__shape)
 
     def snap_to_grid(
-        self, voxel_size: Iterable[Optional[int]], mode: str = "grow"
+        self, voxel_size: Iterable[int | None], mode: str = "grow"
     ) -> "Roi":
         """Align a ROI with a given voxel size.
 
@@ -335,7 +350,7 @@ class Roi(Freezable):
             begin_in_voxel = self.begin.ceil_division(voxel_size)
             end_in_voxel = self.end.floor_division(voxel_size)
         else:
-            raise RuntimeError("Unknown mode %s for snap_to_grid" % mode)
+            raise RuntimeError(f"Unknown mode {mode} for snap_to_grid")
 
         return Roi(
             begin_in_voxel * voxel_size, (end_in_voxel - begin_in_voxel) * voxel_size
@@ -343,8 +358,8 @@ class Roi(Freezable):
 
     def grow(
         self,
-        amount_neg: Union[Iterable[Optional[int]], int] = 0,
-        amount_pos: Union[Iterable[Optional[int]], int] = 0,
+        amount_neg: Iterable[int | None] | int = 0,
+        amount_pos: Iterable[int | None] | int = 0,
     ) -> "Roi":
         """Grow a ROI by the given amounts in each direction:
 
@@ -363,11 +378,11 @@ class Roi(Freezable):
                 dimensions. Defaults to zero.
         """
         if isinstance(amount_neg, Iterable):
-            _amount_neg: Union[Coordinate, int] = Coordinate(amount_neg)
+            _amount_neg: Coordinate | int = Coordinate(amount_neg)
         else:
             _amount_neg = amount_neg
         if isinstance(amount_pos, Iterable):
-            _amount_pos: Union[Coordinate, int] = Coordinate(amount_pos)
+            _amount_pos: Coordinate | int = Coordinate(amount_pos)
         else:
             _amount_pos = amount_pos
 
@@ -475,7 +490,7 @@ class Roi(Freezable):
                 (str(b) if b is not None else "")
                 + ":"
                 + (str(e) if e is not None else "")
-                for b, e in zip(self.begin, self.end)
+                for b, e in zip(self.begin, self.end, strict=False)
             ]
         )
         dims = ", ".join(str(a) if a is not None else "inf" for a in self.__shape)
