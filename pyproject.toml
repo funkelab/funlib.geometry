@@ -28,9 +28,9 @@ Issues = "https://github.com/funkelab/funlib.geometry/issues"
 dev = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
-    # pinned with == until uv.lock is committed: both change their rule sets between releases
-    "ruff==0.17.3",
-    "ty==0.0.96",
+    # versions come from uv.lock; `uv lock --upgrade` moves them
+    "ruff>=0.17.3",
+    "ty>=0.0.96",
 ]
 
 [tool.setuptools.dynamic]
