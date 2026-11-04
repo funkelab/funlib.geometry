@@ -1,12 +1,15 @@
 [![tests](https://github.com/funkelab/funlib.geometry/actions/workflows/tests.yaml/badge.svg)](https://github.com/funkelab/funlib.geometry/actions/workflows/tests.yaml)
 [![lint](https://github.com/funkelab/funlib.geometry/actions/workflows/lint.yaml/badge.svg)](https://github.com/funkelab/funlib.geometry/actions/workflows/lint.yaml)
+[![publish](https://github.com/funkelab/funlib.geometry/actions/workflows/publish.yaml/badge.svg)](https://pypi.org/project/funlib.geometry/)
 
 # funlib.geometry
 A package for Coordinates, Rois and common operations in Coordinate spaces
 
-## Installation
+## Install
 
-`pip install funlib.geometry`
+```bash
+pip install funlib.geometry    # or: uv add funlib.geometry
+```
 
 ## Usage
 
@@ -79,3 +82,18 @@ roi.snap_to_grid(Coordinate(4, 4), mode="grow")  # Roi((0, 4), (16, 16))
 data = np.zeros((100, 100))
 region = data[roi.to_slices()]  # equivalent to data[3:13, 7:17]
 ```
+
+## Contributing
+
+The commands below are the ones CI runs, so a green local run means a green PR.
+
+```bash
+git clone https://github.com/funkelab/funlib.geometry
+cd funlib.geometry
+uv sync                                             # Python, dependencies, dev tools (from uv.lock)
+uv run pytest                                       # tests with coverage
+uv run ruff check . && uv run ruff format --check . # lint and formatting
+uv run ty check                                     # types
+```
+
+`uv.lock` pins the development environment; the `lock-upgrade` workflow refreshes it monthly and opens a pull request.

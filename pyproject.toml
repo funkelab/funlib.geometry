@@ -20,6 +20,10 @@ requires-python = ">=3.10"
 
 dependencies = []
 
+[project.urls]
+Source = "https://github.com/funkelab/funlib.geometry"
+Issues = "https://github.com/funkelab/funlib.geometry/issues"
+
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",
