@@ -21,6 +21,7 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.urls]
+Documentation = "https://funkelab.github.io/funlib.geometry"
 Source = "https://github.com/funkelab/funlib.geometry"
 Issues = "https://github.com/funkelab/funlib.geometry/issues"
 
@@ -31,6 +32,12 @@ dev = [
     # versions come from uv.lock; `uv lock --upgrade` moves them
     "ruff>=0.17.3",
     "ty>=0.0.96",
+]
+docs = [
+    "sphinx>=8",
+    "sphinx-autodoc-typehints>=2",
+    "myst-parser>=4",
+    "pydata-sphinx-theme>=0.16",
 ]
 
 [tool.setuptools.dynamic]

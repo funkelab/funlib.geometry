@@ -6,3 +6,4 @@ build
 
 # pytest-cov output
 coverage.xml
+docs/build/

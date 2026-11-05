@@ -11,6 +11,7 @@ logger = logging.getLogger(__file__)
 
 class Roi(Freezable):
     """A rectangular region of interest, defined by an offset and a shape.
+
     Special Cases:
         An infinite/unbounded ROI:
             offset = (None, None, ...)
