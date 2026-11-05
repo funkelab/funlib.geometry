@@ -92,6 +92,7 @@ git clone https://github.com/funkelab/funlib.geometry
 cd funlib.geometry
 uv sync                                             # Python, dependencies, dev tools (from uv.lock)
 uv run pytest                                       # tests with coverage
+uv run pytest --no-cov tests/<file>.py              # one file, without the coverage floor
 uv run ruff check . && uv run ruff format --check . # lint and formatting
 uv run ty check                                     # types
 ```
