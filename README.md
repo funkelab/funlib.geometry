@@ -1,9 +1,12 @@
 [![tests](https://github.com/funkelab/funlib.geometry/actions/workflows/tests.yaml/badge.svg)](https://github.com/funkelab/funlib.geometry/actions/workflows/tests.yaml)
 [![lint](https://github.com/funkelab/funlib.geometry/actions/workflows/lint.yaml/badge.svg)](https://github.com/funkelab/funlib.geometry/actions/workflows/lint.yaml)
+[![docs](https://github.com/funkelab/funlib.geometry/actions/workflows/docs.yaml/badge.svg)](https://funkelab.github.io/funlib.geometry)
 [![publish](https://github.com/funkelab/funlib.geometry/actions/workflows/publish.yaml/badge.svg)](https://pypi.org/project/funlib.geometry/)
 
 # funlib.geometry
 A package for Coordinates, Rois and common operations in Coordinate spaces
+
+**Documentation:** https://funkelab.github.io/funlib.geometry
 
 ## Install
 
@@ -92,8 +95,10 @@ git clone https://github.com/funkelab/funlib.geometry
 cd funlib.geometry
 uv sync                                             # Python, dependencies, dev tools (from uv.lock)
 uv run pytest                                       # tests with coverage
+uv run pytest --no-cov tests/<file>.py              # one file, without the coverage floor
 uv run ruff check . && uv run ruff format --check . # lint and formatting
 uv run ty check                                     # types
+uv run --group docs sphinx-build -W docs/source docs/build/html   # docs
 ```
 
 `uv.lock` pins the development environment; the `lock-upgrade` workflow refreshes it monthly and opens a pull request.
