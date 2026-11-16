@@ -1,3 +1,5 @@
+import operator
+
 import pytest
 
 from funlib.geometry import Coordinate
@@ -22,7 +24,6 @@ def test_constructor():
 def test_arithmetic():
     a = Coordinate((1, 2, 3))
     b = Coordinate((4, 5, 6))
-    c = Coordinate((7, 8))
 
     assert a + b == (5, 7, 9)
     assert a - b == (-3, -3, -3)
@@ -43,26 +44,23 @@ def test_arithmetic():
     assert b / 2 == (2, 2, 3)
     assert b // 2 == (2, 2, 3)
 
+
+@pytest.mark.parametrize(
+    "op",
+    [operator.add, operator.sub, operator.mul, operator.truediv, operator.floordiv],
+)
+def test_arithmetic_with_non_number_raises_type_error(op):
     with pytest.raises(TypeError):
-        a + "invalid"
-    with pytest.raises(TypeError):
-        a - "invalid"  # ty: ignore[unsupported-operator]  # intentional misuse
-    with pytest.raises(TypeError):
-        a * "invalid"
-    with pytest.raises(TypeError):
-        a / "invalid"  # ty: ignore[unsupported-operator]  # intentional misuse
-    with pytest.raises(TypeError):
-        a // "invalid"  # ty: ignore[unsupported-operator]  # intentional misuse
+        op(Coordinate(1, 2, 3), "invalid")
+
+
+@pytest.mark.parametrize(
+    "op",
+    [operator.add, operator.sub, operator.mul, operator.truediv, operator.floordiv],
+)
+def test_arithmetic_with_mismatched_dims_raises_assertion_error(op):
     with pytest.raises(AssertionError):
-        a + c
-    with pytest.raises(AssertionError):
-        a - c
-    with pytest.raises(AssertionError):
-        a * c
-    with pytest.raises(AssertionError):
-        a / c
-    with pytest.raises(AssertionError):
-        a // c
+        op(Coordinate(1, 2, 3), Coordinate(7, 8))
 
 
 def test_division():
