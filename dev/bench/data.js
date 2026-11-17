@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794423723537,
+  "lastUpdate": 1794937469090,
   "repoUrl": "https://github.com/funkelab/funlib.geometry",
   "entries": {
     "funlib.geometry": [
@@ -33,6 +33,41 @@ window.BENCHMARK_DATA = {
           {
             "name": "pytest wall time",
             "value": 0.607,
+            "unit": "s",
+            "extra": "`uv run pytest` in the tests job"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "William Patton",
+            "username": "pattonw",
+            "email": "wllmpttn24@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "d87cbf4cb881cf4deed2055d3a800e6f934112ca",
+          "message": "Merge pull request #10 from funkelab/tests/quality\n\nTests: specification-style rewrite",
+          "timestamp": "2026-11-17T17:43:54Z",
+          "url": "https://github.com/funkelab/funlib.geometry/commit/d87cbf4cb881cf4deed2055d3a800e6f934112ca"
+        },
+        "date": 1794937468413,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "import funlib.geometry (cold)",
+            "value": 14.901,
+            "range": "± 1.233",
+            "unit": "ms",
+            "extra": "interpreter startup 9.7 ms subtracted; n=10"
+          },
+          {
+            "name": "pytest wall time",
+            "value": 0.827,
             "unit": "s",
             "extra": "`uv run pytest` in the tests job"
           }
