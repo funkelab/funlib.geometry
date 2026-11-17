@@ -49,18 +49,13 @@ def test_arithmetic():
     "op",
     [operator.add, operator.sub, operator.mul, operator.truediv, operator.floordiv],
 )
-def test_arithmetic_with_non_number_raises_type_error(op):
-    with pytest.raises(TypeError):
-        op(Coordinate(1, 2, 3), "invalid")
-
-
 @pytest.mark.parametrize(
-    "op",
-    [operator.add, operator.sub, operator.mul, operator.truediv, operator.floordiv],
+    "other, error",
+    [("invalid", TypeError), (Coordinate(7, 8), AssertionError)],  # type, dims
 )
-def test_arithmetic_with_mismatched_dims_raises_assertion_error(op):
-    with pytest.raises(AssertionError):
-        op(Coordinate(1, 2, 3), Coordinate(7, 8))
+def test_arithmetic_with_unsupported_operand_raises(op, other, error):
+    with pytest.raises(error):
+        op(Coordinate(1, 2, 3), other)
 
 
 def test_division():

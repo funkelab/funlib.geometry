@@ -3,6 +3,13 @@ import pytest
 from funlib.geometry import Coordinate as Coord
 from funlib.geometry import Roi
 
+# shared read-only ROIs; tests that mutate a ROI build their own
+A = Roi((0, 0, 0), (100, 100, 100))
+B = Roi((50, 50, 50), (100, 100, 100))
+C = Roi((25, 25, 25), (50, 50, 50))
+A_UNBOUNDED_Y = Roi((0, None, 0), (100, None, 100))
+SMALL = Roi((0, 0, 0), (10, 10, 10))
+
 
 def test_squeeze():
     r = Roi((1, 2, 3), (4, 5, 6))
@@ -66,17 +73,11 @@ def test_set_shape_and_offset():
 
 
 def test_equality():
-    assert Roi((0, 0, 0), (100, 100, 100)) == Roi((0, 0, 0), (100, 100, 100))
-    assert Roi((0, 0, 0), (100, 100, 100)) != Roi((50, 50, 50), (100, 100, 100))
+    assert A == Roi((0, 0, 0), (100, 100, 100))
+    assert A != B
 
 
-@pytest.mark.parametrize(
-    "roi, center",
-    [
-        (Roi((0, 0, 0), (100, 100, 100)), (50, 50, 50)),
-        (Roi((50, 50, 50), (100, 100, 100)), (100, 100, 100)),
-    ],
-)
+@pytest.mark.parametrize("roi, center", [(A, (50, 50, 50)), (B, (100, 100, 100))])
 def test_center(roi, center):
     assert roi.center == center
 
@@ -84,109 +85,56 @@ def test_center(roi, center):
 @pytest.mark.parametrize(
     "a, b, expected",
     [
-        # overlapping
-        (Roi((0, 0, 0), (100, 100, 100)), Roi((50, 50, 50), (100, 100, 100)), True),
-        (Roi((50, 50, 50), (100, 100, 100)), Roi((0, 0, 0), (100, 100, 100)), True),
-        (Roi((0, 0, 0), (100, 100, 100)), Roi((0, 0, 0), (1, 1, 1)), True),
-        # unbounded
-        (Roi((0, 0, 0), (100, 100, 100)), Roi((None,) * 3, (None,) * 3), True),
-        # touching
-        (Roi((0, 0, 0), (100, 100, 100)), Roi((100, 100, 100), (1, 1, 1)), False),
-        # empty
-        (Roi((0, 0, 0), (100, 100, 100)), Roi((0, 0, 0), (0, 0, 0)), False),
+        (A, B, True),  # overlapping
+        (A, Roi((0, 0, 0), (1, 1, 1)), True),
+        (A, Roi((None,) * 3, (None,) * 3), True),  # unbounded
+        (A, Roi((100, 100, 100), (1, 1, 1)), False),  # touching
+        (A, Roi((0, 0, 0), (0, 0, 0)), False),  # empty
     ],
 )
 def test_intersects(a, b, expected):
     assert a.intersects(b) is expected
+    assert b.intersects(a) is expected
 
 
 @pytest.mark.parametrize(
     "a, b, expected",
     [
-        (
-            Roi((0, 0, 0), (100, 100, 100)),
-            Roi((50, 50, 50), (100, 100, 100)),
-            Roi((50, 50, 50), (50, 50, 50)),
-        ),
-        (
-            Roi((50, 50, 50), (100, 100, 100)),
-            Roi((0, 0, 0), (100, 100, 100)),
-            Roi((50, 50, 50), (50, 50, 50)),
-        ),
-        # one dimension unbounded
-        (
-            Roi((0, None, 0), (100, None, 100)),
-            Roi((50, 50, 50), (100, 100, 100)),
-            Roi((50, 50, 50), (50, 100, 50)),
-        ),
-        (
-            Roi((50, 50, 50), (100, 100, 100)),
-            Roi((0, None, 0), (100, None, 100)),
-            Roi((50, 50, 50), (50, 100, 50)),
-        ),
+        (A, B, Roi((50, 50, 50), (50, 50, 50))),
+        (A_UNBOUNDED_Y, B, Roi((50, 50, 50), (50, 100, 50))),
         # no overlap: the empty ROI has no offset
-        (
-            Roi((0, 0, 0), (100, 100, 100)),
-            Roi((100, 100, 100), (1, 1, 1)),
-            Roi((None, None, None), (0, 0, 0)),
-        ),
+        (A, Roi((100, 100, 100), (1, 1, 1)), Roi((None, None, None), (0, 0, 0))),
     ],
 )
 def test_intersect(a, b, expected):
     assert a.intersect(b) == expected
+    assert b.intersect(a) == expected
 
 
 @pytest.mark.parametrize(
     "a, b, expected",
     [
-        (
-            Roi((0, 0, 0), (100, 100, 100)),
-            Roi((50, 50, 50), (100, 100, 100)),
-            Roi((0, 0, 0), (150, 150, 150)),
-        ),
-        (
-            Roi((50, 50, 50), (100, 100, 100)),
-            Roi((0, 0, 0), (100, 100, 100)),
-            Roi((0, 0, 0), (150, 150, 150)),
-        ),
-        # one dimension unbounded
-        (
-            Roi((0, None, 0), (100, None, 100)),
-            Roi((50, 50, 50), (100, 100, 100)),
-            Roi((0, None, 0), (150, None, 150)),
-        ),
-        (
-            Roi((50, 50, 50), (100, 100, 100)),
-            Roi((0, None, 0), (100, None, 100)),
-            Roi((0, None, 0), (150, None, 150)),
-        ),
+        (A, B, Roi((0, 0, 0), (150, 150, 150))),
+        (A_UNBOUNDED_Y, B, Roi((0, None, 0), (150, None, 150))),
     ],
 )
 def test_union(a, b, expected):
     assert a.union(b) == expected
+    assert b.union(a) == expected
 
 
 @pytest.mark.parametrize(
     "roi, other, expected",
     [
-        # a ROI
-        (Roi((0, 0, 0), (100, 100, 100)), Roi((25, 25, 25), (50, 50, 50)), True),
-        (Roi((50, 50, 50), (100, 100, 100)), Roi((25, 25, 25), (50, 50, 50)), False),
-        # a coordinate
-        (Roi((0, 0, 0), (100, 100, 100)), Coord(50, 50, 50), True),
-        # one dimension unbounded
-        (Roi((0, None, 0), (100, None, 100)), Roi((25, 25, 25), (50, 50, 50)), True),
-        (Roi((0, None, 0), (100, None, 100)), Roi((None,) * 3, (None,) * 3), False),
+        (A, C, True),
+        (B, C, False),
+        (A, Coord(50, 50, 50), True),
+        (A_UNBOUNDED_Y, C, True),
+        (A_UNBOUNDED_Y, Roi((None,) * 3, (None,) * 3), False),
         # an empty ROI is contained when its offset is
-        (Roi((0, None, 0), (100, None, 100)), Roi((0, 0, 0), (0, 0, 0)), True),
-        (Roi((0, 0, 0), (10, 10, 10)), Roi((5, 5, 5), (0, 0, 0)), True),
-        (Roi((0, 0, 0), (10, 10, 10)), Roi((-1, 5, 5), (0, 0, 0)), False),
-        # an empty ROI contains the empty ROI
-        (
-            Roi((None, None, None), (0, 0, 0)),
-            Roi((None, None, None), (0, 0, 0)),
-            True,
-        ),
+        (A_UNBOUNDED_Y, Roi((0, 0, 0), (0, 0, 0)), True),
+        (SMALL, Roi((5, 5, 5), (0, 0, 0)), True),
+        (SMALL, Roi((-1, 5, 5), (0, 0, 0)), False),
     ],
 )
 def test_contains(roi, other, expected):
@@ -197,33 +145,17 @@ def test_contains(roi, other, expected):
     "roi, amount_neg, amount_pos, expected",
     [
         (
-            Roi((0, None, 0), (100, None, 100)),
+            A_UNBOUNDED_Y,
             Coord(1, 1, 1),
             Coord(1, 1, 1),
             Roi((-1, None, -1), (102, None, 102)),
         ),
-        (
-            Roi((0, None, 0), (100, None, 100)),
-            -1,
-            -1,
-            Roi((1, None, 1), (98, None, 98)),
-        ),
-        (Roi((0, None, 0), (100, None, 100)), -1, 0, Roi((1, None, 1), (99, None, 99))),
-        (
-            Roi((0, None, 0), (100, None, 100)),
-            0,
-            Coord(-1, -1, -1),
-            Roi((0, None, 0), (99, None, 99)),
-        ),
-        # tuples
-        (
-            Roi((0, 0, 0), (10, 10, 10)),
-            (1, 2, 3),
-            (1, 2, 3),
-            Roi((-1, -2, -3), (12, 14, 16)),
-        ),
+        (A_UNBOUNDED_Y, -1, -1, Roi((1, None, 1), (98, None, 98))),
+        (A_UNBOUNDED_Y, -1, 0, Roi((1, None, 1), (99, None, 99))),
+        (A_UNBOUNDED_Y, 0, Coord(-1, -1, -1), Roi((0, None, 0), (99, None, 99))),
+        (SMALL, (1, 2, 3), (1, 2, 3), Roi((-1, -2, -3), (12, 14, 16))),  # tuples
         # shrinking to zero size keeps the offset
-        (Roi((0, 0, 0), (10, 10, 10)), -5, -5, Roi((5, 5, 5), (0, 0, 0))),
+        (SMALL, -5, -5, Roi((5, 5, 5), (0, 0, 0))),
     ],
 )
 def test_grow(roi, amount_neg, amount_pos, expected):
@@ -244,7 +176,7 @@ def test_grow(roi, amount_neg, amount_pos, expected):
         # negative offset, already on the grid
         (Roi((-20,), (2,)), Coord(2), "shrink", Roi((-20,), (2,))),
         # tuple voxel size
-        (Roi((0, 0, 0), (10, 10, 10)), (4, 4, 4), "grow", Roi((0, 0, 0), (12, 12, 12))),
+        (SMALL, (4, 4, 4), "grow", Roi((0, 0, 0), (12, 12, 12))),
     ],
 )
 def test_snap_to_grid(roi, voxel_size, mode, expected):
