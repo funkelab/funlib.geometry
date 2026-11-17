@@ -1,3 +1,5 @@
+import operator
+
 import pytest
 
 from funlib.geometry import Coordinate
@@ -22,7 +24,6 @@ def test_constructor():
 def test_arithmetic():
     a = Coordinate((1, 2, 3))
     b = Coordinate((4, 5, 6))
-    c = Coordinate((7, 8))
 
     assert a + b == (5, 7, 9)
     assert a - b == (-3, -3, -3)
@@ -43,26 +44,18 @@ def test_arithmetic():
     assert b / 2 == (2, 2, 3)
     assert b // 2 == (2, 2, 3)
 
-    with pytest.raises(TypeError):
-        a + "invalid"
-    with pytest.raises(TypeError):
-        a - "invalid"  # ty: ignore[unsupported-operator]  # intentional misuse
-    with pytest.raises(TypeError):
-        a * "invalid"
-    with pytest.raises(TypeError):
-        a / "invalid"  # ty: ignore[unsupported-operator]  # intentional misuse
-    with pytest.raises(TypeError):
-        a // "invalid"  # ty: ignore[unsupported-operator]  # intentional misuse
-    with pytest.raises(AssertionError):
-        a + c
-    with pytest.raises(AssertionError):
-        a - c
-    with pytest.raises(AssertionError):
-        a * c
-    with pytest.raises(AssertionError):
-        a / c
-    with pytest.raises(AssertionError):
-        a // c
+
+@pytest.mark.parametrize(
+    "op",
+    [operator.add, operator.sub, operator.mul, operator.truediv, operator.floordiv],
+)
+@pytest.mark.parametrize(
+    "other, error",
+    [("invalid", TypeError), (Coordinate(7, 8), AssertionError)],  # type, dims
+)
+def test_arithmetic_with_unsupported_operand_raises(op, other, error):
+    with pytest.raises(error):
+        op(Coordinate(1, 2, 3), other)
 
 
 def test_division():

@@ -3,6 +3,13 @@ import pytest
 from funlib.geometry import Coordinate as Coord
 from funlib.geometry import Roi
 
+# shared read-only ROIs; tests that mutate a ROI build their own
+A = Roi((0, 0, 0), (100, 100, 100))
+B = Roi((50, 50, 50), (100, 100, 100))
+C = Roi((25, 25, 25), (50, 50, 50))
+A_UNBOUNDED_Y = Roi((0, None, 0), (100, None, 100))
+SMALL = Roi((0, 0, 0), (10, 10, 10))
+
 
 def test_squeeze():
     r = Roi((1, 2, 3), (4, 5, 6))
@@ -13,22 +20,28 @@ def test_squeeze():
     assert r == Roi((1, 3), (4, 6))
 
 
-def test_shape():
-    r = Roi((0,), (1,))
-    assert r.size == 1
-    assert r.empty is False
-    assert r.unbounded is False
+def test_offset_and_shape_dims_must_match():
+    with pytest.raises(AssertionError):
+        Roi((0,), (1, 2, 3))
 
-    r = Roi((0,), (0,))
-    assert r.size == 0
-    assert r.empty is True
-    assert r.unbounded is False
 
-    # unbounded ROI
+@pytest.mark.parametrize(
+    "roi, size, empty, unbounded",
+    [
+        (Roi((0,), (1,)), 1, False, False),
+        (Roi((0,), (0,)), 0, True, False),
+        (Roi((0,), (None,)), None, False, True),
+    ],
+)
+def test_size_empty_unbounded(roi, size, empty, unbounded):
+    assert roi.size == size
+    assert roi.empty is empty
+    assert roi.unbounded is unbounded
+
+
+def test_set_shape_and_offset():
+    # unbounded ROI: the offset of an unbounded dimension is None
     r = Roi((0,), (None,))
-    assert r.size is None
-    assert r.empty is False
-    assert r.unbounded is True
     assert r.offset == (None,)
     assert r.end == (None,)
     assert r.shape == (None,)
@@ -59,81 +72,120 @@ def test_shape():
     assert r.size is None
 
 
-def test_operators():
-    a = Roi((0, 0, 0), (100, 100, 100))
-    b = Roi((50, 50, 50), (100, 100, 100))
-
-    assert a != b
-    assert a.intersects(b)
-    assert b.intersects(a)
-    assert a.intersects(Roi((None,) * 3, (None,) * 3))
-    assert a.intersects(Roi((0, 0, 0), (1, 1, 1)))
-    assert not a.intersects(Roi((0, 0, 0), (0, 0, 0)))
-    assert a.intersect(Roi((100, 100, 100), (1, 1, 1))).empty
-
-    assert a.center == (50, 50, 50)
-    assert b.center == (100, 100, 100)
-
-    assert a.intersect(b) == Roi((50, 50, 50), (50, 50, 50))
-    assert b.intersect(a) == Roi((50, 50, 50), (50, 50, 50))
-    assert a.union(b) == Roi((0, 0, 0), (150, 150, 150))
-    assert b.union(a) == Roi((0, 0, 0), (150, 150, 150))
-
-    c = Roi((25, 25, 25), (50, 50, 50))
-
-    assert a.contains(c)
-    assert a.contains(c.center)
-    assert not b.contains(c)
-
-    a = Roi((0, None, 0), (100, None, 100))
-    b = Roi((50, 50, 50), (100, 100, 100))
-
-    assert a.intersect(b) == Roi((50, 50, 50), (50, 100, 50))
-    assert b.intersect(a) == Roi((50, 50, 50), (50, 100, 50))
-    assert a.union(b) == Roi((0, None, 0), (150, None, 150))
-    assert b.union(a) == Roi((0, None, 0), (150, None, 150))
-
-    c = Roi((25, 25, 25), (50, 50, 50))
-
-    assert a.contains(c)
-    assert not b.contains(c)
-    assert a.contains(Roi((0, 0, 0), (0, 0, 0)))
-    # assert b.contains(Roi((0, 0, 0), (0, 0, 0)))
-    assert not a.contains(Roi((None,) * 3, (None,) * 3))
-
-    assert a.grow(Coord(1, 1, 1), Coord(1, 1, 1)) == Roi(
-        (-1, None, -1), (102, None, 102)
-    )
-    assert a.grow(-1, -1) == Roi((1, None, 1), (98, None, 98))
-    assert a.grow(-1, 0) == Roi((1, None, 1), (99, None, 99))
-    assert a.grow(amount_pos=Coord(-1, -1, -1)) == Roi((0, None, 0), (99, None, 99))
+def test_equality():
+    assert A == Roi((0, 0, 0), (100, 100, 100))
+    assert A != B
 
 
-def test_snap():
-    a = Roi((1,), (7,))
+@pytest.mark.parametrize("roi, center", [(A, (50, 50, 50)), (B, (100, 100, 100))])
+def test_center(roi, center):
+    assert roi.center == center
 
-    assert a.snap_to_grid(Coord(2), "grow") == Roi((0,), (8,))
-    assert a.snap_to_grid(Coord(2), "shrink") == Roi((2,), (6,))
-    assert a.snap_to_grid(Coord(2), "closest") == Roi((0,), (8,))
 
-    assert a.snap_to_grid(Coord(3), "grow") == Roi((0,), (9,))
-    assert a.snap_to_grid(Coord(3), "shrink") == Roi((3,), (3,))
-    assert a.snap_to_grid(Coord(3), "closest") == Roi((0,), (9,))
+@pytest.mark.parametrize(
+    "a, b, expected",
+    [
+        (A, B, True),  # overlapping
+        (A, Roi((0, 0, 0), (1, 1, 1)), True),
+        (A, Roi((None,) * 3, (None,) * 3), True),  # unbounded
+        (A, Roi((100, 100, 100), (1, 1, 1)), False),  # touching
+        (A, Roi((0, 0, 0), (0, 0, 0)), False),  # empty
+    ],
+)
+def test_intersects(a, b, expected):
+    assert a.intersects(b) is expected
+    assert b.intersects(a) is expected
 
-    a = Roi((1, None), (7, None))
-    assert a.snap_to_grid(Coord(2, 1), "grow") == Roi((0, None), (8, None))
 
+@pytest.mark.parametrize(
+    "a, b, expected",
+    [
+        (A, B, Roi((50, 50, 50), (50, 50, 50))),
+        (A_UNBOUNDED_Y, B, Roi((50, 50, 50), (50, 100, 50))),
+        # no overlap: the empty ROI has no offset
+        (A, Roi((100, 100, 100), (1, 1, 1)), Roi((None, None, None), (0, 0, 0))),
+    ],
+)
+def test_intersect(a, b, expected):
+    assert a.intersect(b) == expected
+    assert b.intersect(a) == expected
+
+
+@pytest.mark.parametrize(
+    "a, b, expected",
+    [
+        (A, B, Roi((0, 0, 0), (150, 150, 150))),
+        (A_UNBOUNDED_Y, B, Roi((0, None, 0), (150, None, 150))),
+    ],
+)
+def test_union(a, b, expected):
+    assert a.union(b) == expected
+    assert b.union(a) == expected
+
+
+@pytest.mark.parametrize(
+    "roi, other, expected",
+    [
+        (A, C, True),
+        (B, C, False),
+        (A, Coord(50, 50, 50), True),
+        (A_UNBOUNDED_Y, C, True),
+        (A_UNBOUNDED_Y, Roi((None,) * 3, (None,) * 3), False),
+        # an empty ROI is contained when its offset is
+        (A_UNBOUNDED_Y, Roi((0, 0, 0), (0, 0, 0)), True),
+        (SMALL, Roi((5, 5, 5), (0, 0, 0)), True),
+        (SMALL, Roi((-1, 5, 5), (0, 0, 0)), False),
+    ],
+)
+def test_contains(roi, other, expected):
+    assert roi.contains(other) is expected
+
+
+@pytest.mark.parametrize(
+    "roi, amount_neg, amount_pos, expected",
+    [
+        (
+            A_UNBOUNDED_Y,
+            Coord(1, 1, 1),
+            Coord(1, 1, 1),
+            Roi((-1, None, -1), (102, None, 102)),
+        ),
+        (A_UNBOUNDED_Y, -1, -1, Roi((1, None, 1), (98, None, 98))),
+        (A_UNBOUNDED_Y, -1, 0, Roi((1, None, 1), (99, None, 99))),
+        (A_UNBOUNDED_Y, 0, Coord(-1, -1, -1), Roi((0, None, 0), (99, None, 99))),
+        (SMALL, (1, 2, 3), (1, 2, 3), Roi((-1, -2, -3), (12, 14, 16))),  # tuples
+        # shrinking to zero size keeps the offset
+        (SMALL, -5, -5, Roi((5, 5, 5), (0, 0, 0))),
+    ],
+)
+def test_grow(roi, amount_neg, amount_pos, expected):
+    assert roi.grow(amount_neg, amount_pos) == expected
+
+
+@pytest.mark.parametrize(
+    "roi, voxel_size, mode, expected",
+    [
+        (Roi((1,), (7,)), Coord(2), "grow", Roi((0,), (8,))),
+        (Roi((1,), (7,)), Coord(2), "shrink", Roi((2,), (6,))),
+        (Roi((1,), (7,)), Coord(2), "closest", Roi((0,), (8,))),
+        (Roi((1,), (7,)), Coord(3), "grow", Roi((0,), (9,))),
+        (Roi((1,), (7,)), Coord(3), "shrink", Roi((3,), (3,))),
+        (Roi((1,), (7,)), Coord(3), "closest", Roi((0,), (9,))),
+        # one dimension unbounded
+        (Roi((1, None), (7, None)), Coord(2, 1), "grow", Roi((0, None), (8, None))),
+        # negative offset, already on the grid
+        (Roi((-20,), (2,)), Coord(2), "shrink", Roi((-20,), (2,))),
+        # tuple voxel size
+        (SMALL, (4, 4, 4), "grow", Roi((0, 0, 0), (12, 12, 12))),
+    ],
+)
+def test_snap_to_grid(roi, voxel_size, mode, expected):
+    assert roi.snap_to_grid(voxel_size, mode) == expected
+
+
+def test_snap_to_grid_unknown_mode():
     with pytest.raises(RuntimeError):
-        a.snap_to_grid(Coord(3, 1), "doesntexist")
-
-    r = Roi((-20,), (2,))
-    c = Coord(
-        2,
-    )
-    assert not r.snap_to_grid(c, mode="shrink").empty, (
-        f"begin: {(r.begin, r.begin.ceil_division(c))}, "
-        f"end: {(r.end, r.end.floor_division(c))}"
-    )
+        Roi((1, None), (7, None)).snap_to_grid(Coord(3, 1), "doesntexist")
 
 
 def test_arithmetic():
